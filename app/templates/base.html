@@ -1,41 +1,43 @@
-{% extends "bootstrap/base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}equilibrium: a minimal workspace{% endblock %}</title>
 
-{% block title %}equilibrium{% endblock %}
+    {% block metas %}
+    <meta charset="utf-8">
+    <meta name="application-name" content="equilibrium">
+    <meta name="author" content="ntduck">
+    <meta name="description" content="a minimalist workspace">
+    <meta name="generator" content="Flask 2.2.3">
+    <meta name="referrer" content="no-referrer">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% endblock metas %}
 
-{% block head %}
-{{ super() }}
-<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-{% endblock %}
-
-{% block navbar %}
-<div class="navbar navbar-inverse" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">Home</a>
+    {% block styles %}
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicons/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% endblock styles %}
+</head>
+<body>
+    <div class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4">
+        <div class="shrink-0">
+            <a href="{{ url_for('main.index') }}">
+                <img class="h-12 w-12" src="{{ url_for('static', filename='images/logos/favicon.svg') }}" alt="Placeholder">
+            </a>
         </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="https://github.com/NTDuck/project-equilibrium/">About</a></li>
-            </ul>
+        <div>
+            <div class="text-xl font-medium text-black">Placeholder</div>
+            <p class="text-slate-500">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nulla suscipit laudantium vero nostrum voluptas adipisci ut, quis, aliquam itaque nam ullam modi sequi. Ad modi maiores vel animi earum iste?</p>
         </div>
     </div>
-</div>
-{% endblock %}
+    <div class="container">
+        {% block content %}
+        {% endblock content %}
+    </div>
 
-{% block content %}
-<div class="container">
-    {% block page_content %}
-    {% endblock %}
-</div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-{% endblock %}
+    {% block scripts %}
+    {{ moment.include_moment() }}
+    {% endblock scripts %}
+</body>
+</html>
