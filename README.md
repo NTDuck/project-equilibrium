@@ -1,59 +1,93 @@
-# Project Equilibrium
 
-A Flask web application for a minimalistic workspace.
+# project-equilibrium
 
-## Getting Started
+a minimal workspace.
+## Features
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+- A funny-looking mascot that chills when you suffer (pending)
+- A simple todolist that you'll probably find useless (pending)
+- A music player that prevents you from concentrating on your work (pending)
+- An AI-powered chatbot that pales into insignificance beside ChatGPT (pending)
+- A beautiful and comfortable [dark color scheme](https://github.com/monkeytypegame/monkeytype/blob/16c956c62c241deb9c3ffd0f3b3647625df4156e/frontend/static/themes/serika_dark.css) to reduce eye strain and help you focus.
+## Dependencies
 
-### Prerequisites
+- [Python](https://www.python.org/downloads/) 3.11.3 or above.
+- [Node.js](https://nodejs.org/en/download) 18.16.0 or above.
+- [git](https://git-scm.com/downloads)
+## Installation
 
-- Python 3.11 or higher
-- pip
+Make sure the depencencies are installed on your local machine.
+```
+$ python --version
+Python 3.11.3
+$ npm --version
+9.6.4
+$ git --version
+git version 2.40.0.windows.1
+```
+Clone the repository:
+```
+$ git clone https://github.com/NTDuck/project-equilibrium.git
+$ cd project-equilibrium
+```
+Install the required packages:
+```
+# windows
+$ python -m venv venv
+$ venv\Scripts\activate
 
-### Features
+# macos/linux
+$ python3 -m venv venv
+$ source venv/bin/activate
+```
+```
+(venv) $ pip install -r requirements.txt
+(venv) $ npm install
+```
+Alternatively, for ensured version conflict/incompatibility:
+```
+(venv) $ pip install flask flask-moment Flask-HTMLmin python-dotenv
+```
+Add the environment variables.
+```
+# windows
+(venv) $ set FLASK_APP=main
+(venv) $ set FLASK_DEBUG=1
 
-- Nothing here for now.
+# macos/linux
+(venv) $ export FLASK_APP=main
+(venv) $ export FLASK_DEBUG=1
+```
+Alternatively, you can create a .env file under the root folder with the following content:
+```
+FLASK_APP=main
+FLASK_DEBUG=1
+```
 
-### Installation
+## Deployment
 
-1. Clone the repository:
+To start the server, simply run:
+```
+(venv) $ flask run
+ * Serving Flask app 'main'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: XXX-XXX-XXX
+```
 
-    ```
-    git clone https://github.com/NTDuck/project-equilibrium.git
-    cd project-equilibrium
-    ```
+## Screenshots
 
-2. Install the requirements:
-
-    ```
-    pip install -r requirements.txt
-    ```
-
-### Run Locally
-
-1. Start the Flask development server:
-
-    ```
-    $ setup
-    $ flask run
-    ```
-
-2. Open http://localhost:5000/ in a web browser.
-
-### Tech Stack
-
-- Flask
-- HTML/CSS/JavaScript
-- SQLite/SQLAlchemy
-- Other technologies
-
-### Acknowledgements
-
-- Inspiration
-- Libraries
-- Other acknowledgements
-
+![](/app/static/images/.github/screenshot.jpeg)
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+[MIT](LICENSE)
+
+
+## Support
+
+If you wish to support further development and feel extra awesome, you can [buy me a coffee](https://www.buymeacoffee.com/ntduck).
+

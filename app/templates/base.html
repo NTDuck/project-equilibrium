@@ -1,43 +1,72 @@
+{% from "macros.html" import svgNavbar, svgFooter, footerKey %}
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
-    <title>{% block title %}equilibrium: a minimal workspace{% endblock %}</title>
+  <title>{% block title %}equilibrium: a minimal workspace{% endblock %}</title>
 
-    {% block metas %}
-    <meta charset="utf-8">
-    <meta name="application-name" content="equilibrium">
-    <meta name="author" content="ntduck">
-    <meta name="description" content="a minimalist workspace">
-    <meta name="generator" content="Flask 2.2.3">
-    <meta name="referrer" content="no-referrer">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    {% endblock metas %}
+  {% block metas %}
+  <meta charset="utf-8">
+  <meta name="application-name" content="equilibrium">
+  <meta name="author" content="ntduck">
+  <meta name="description" content="a minimalist workspace">
+  <meta name="generator" content="Flask 2.2.3">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% endblock metas %}
 
-    {% block styles %}
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicons/favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    {% endblock styles %}
+  {% block styles %}
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicons/favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% endblock styles %}
 </head>
-<body>
-    <div class="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4">
-        <div class="shrink-0">
-            <a href="{{ url_for('main.index') }}">
-                <img class="h-12 w-12" src="{{ url_for('static', filename='images/logos/favicon.svg') }}" alt="Placeholder">
-            </a>
-        </div>
-        <div>
-            <div class="text-xl font-medium text-black">Placeholder</div>
-            <p class="text-slate-500">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nulla suscipit laudantium vero nostrum voluptas adipisci ut, quis, aliquam itaque nam ullam modi sequi. Ad modi maiores vel animi earum iste?</p>
-        </div>
-    </div>
-    <div class="container">
-        {% block content %}
-        {% endblock content %}
-    </div>
+<body class="flex flex-col h-screen bg-bg-color text-sub-color antialiased">
 
-    {% block scripts %}
-    {{ moment.include_moment() }}
-    {% endblock scripts %}
+  <nav class="flex-none select-none h-24 bg-bg-color">
+    <div class="flex flex-row items-center justify-between max-w-7xl h-full mx-auto px-8">
+      <h2 class="relative self-center text-[2rem] font-Lexend-Deca text-text-color">
+        <div class="absolute text-[.65rem] leading-[.65rem] left-[.25rem] top-[.1rem] text-sub-color">project</div>
+        <a href="{{ url_for('main.index') }}">equilibrium</a>
+      </h2>
+      <div class="flex flex-row flex-grow items-center pt-1 ml-4 gap-x-4 first:pr-0 last:pl-0">
+        {{ svgNavbar("main.about", "about") }}
+        {{ svgNavbar("main.stats", "stats") }}
+        {{ svgNavbar("main.settings", "settings") }}
+        <div class="flex-grow"></div>
+        {{ svgNavbar("auth.login", "anon") }}
+        {{ svgNavbar("main.settings", "notifications") }}
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <footer class="flex-none select-none h-28 mt-4">
+    <div class="flex flex-col text-center max-w-7xl mx-auto px-8 pt-4 text-xs">
+      <div class="group leading-5 mb-4 px-[.1rem]">
+        {{ footerKey("esc") }} or {{ footerKey("ctrl") }}+{{ footerKey("shift") }}+{{ footerKey("p") }} - command line
+      </div>
+      <div class="flex flex-row flex-grow items-center pt-2 ml-4 gap-x-4 first:pr-0 last:pl-0">
+        {{ svgFooter("mailto:nguyentuduck@gmail.com", 1, "gmail", "_blank", "contact") }}
+        {{ svgFooter("https://www.buymeacoffee.com/ntduck", 1, "donate", "_blank", "support") }}
+        {{ svgFooter("https://github.com/NTDuck/project-equilibrium", 1, "github", "_blank", "github") }}
+        {{ svgFooter("main.index", 0, "discord", "_self", "discord") }}
+        {{ svgFooter("main.index", 0, "ToS", "_self", "terms") }}
+        {{ svgFooter("main.index", 0, "security", "_self", "security") }}
+        {{ svgFooter("main.index", 0, "privacy", "_self", "privacy") }}
+        <div class="flex-grow"></div>
+        {{ svgFooter("main.index", 0, "version", "_self", "v0.2.0") }}
+      </div>
+    </div>
+  </footer>
+
+  {% block scripts %}
+  <!-- {{ moment.include_moment() }} -->
+  {% endblock scripts %}
 </body>
 </html>

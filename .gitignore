@@ -130,3 +130,6 @@ dmypy.json
 
 # npm packages
 node_modules/
+
+# batch files
+*.bat

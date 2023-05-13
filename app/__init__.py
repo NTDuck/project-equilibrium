@@ -1,20 +1,12 @@
 
-import os
-
 from config import config
 
 from flask import Flask
-from flask_login import LoginManager
-from flask_migrate import Migrate
 from flask_moment import Moment
-from flask_sqlalchemy import SQLAlchemy
+from flask_htmlmin import HTMLMIN
 
-login_manager = LoginManager()
-migrate = Migrate()
+htmlmin = HTMLMIN(remove_comments=True, remove_empty_space=True)
 moment = Moment()
-db = SQLAlchemy()
-
-login_manager.login_view = "auth.login"
 
 
 def create_app(config_name):
@@ -24,10 +16,9 @@ def create_app(config_name):
     config[config_name].init_app(app)
 
     for ext in (
-        login_manager, moment, db,  
+        htmlmin, moment,
     ):
         ext.init_app(app)
-    migrate.init_app(app, db)
 
     from .main import main as main_bp
     app.register_blueprint(main_bp)

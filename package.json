@@ -90,7 +90,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "tailwind": "npx tailwindcss -i ./app/static/src/tailwind.css -o ./app/static/css/style.css --watch"
+    "watchdog": "npx tailwindcss -i ./app/static/src/tailwind.css -o ./app/static/css/style.css --watch --minify"
   },
   "keywords": [],
   "author": "ntduck",

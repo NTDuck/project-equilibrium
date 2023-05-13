@@ -1,14 +1,14 @@
 
 from flask import render_template
+from werkzeug.exceptions import HTTPException
 
 from . import main
+from constant import HTTP_STATUS_CODES
 
 
-@main.app_errorhandler(404)
-def not_found(e):
-    return render_template("404.html"), 404
-
-
-@main.app_errorhandler(500)
-def internal_server_error(e):
-    return render_template("500.html"), 500
+@main.app_errorhandler(HTTPException)
+def errorhandler(e):
+    err = getattr(e, "code", 500)
+    title = HTTP_STATUS_CODES[err]["title"]
+    description = HTTP_STATUS_CODES[err]["description"]
+    return render_template("error.html", err=err, title=title, description=description), err
