@@ -94,5 +94,8 @@
   },
   "keywords": [],
   "author": "ntduck",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.3"
+  }
 }

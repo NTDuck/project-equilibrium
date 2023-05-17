@@ -1,27 +1,26 @@
 
-from flask import render_template
+from flask import (
+    render_template, request, url_for, redirect, session, 
+)
 
 from . import main
+from constant import TODOLIST_ITEMS
 
 
-# actual objectives
-tasks = [
-    "focus:outline-none does not work (on MS Edge) # seems hard to solve",
-    "needs to work more on error codes & msgs; randomize error svgs",
-    "think of a brand icon to put in the navbar",
-    "implement a bg-darken-popupmenu for some footer icons",
-    "implement basic UI - index.html",
-    "streaming the html",
-    "add a popup when hover task",
-    "write README file",
-]
-for _ in range(10):
-    tasks.append(f"arbitrary value {_}")
-
-
-@main.route("/")
+@main.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("index.html", tasks=tasks)
+
+    session["todolistItems"] = TODOLIST_ITEMS
+
+    if request.method == "POST":
+
+        todolistItemContent = request.form.get("todolistItemContent", "")
+        if not all([i.isspace() for i in todolistItemContent]):   # only append non-empty strings
+            session["todolistItems"].append(todolistItemContent)
+        
+        return redirect(url_for("main.index", todolistItems=session.get("todolistItems")))
+    
+    return render_template("index.html", todolistItems=session.get("todolistItems"))
 
 
 @main.route("/about")

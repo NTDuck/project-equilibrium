@@ -18,6 +18,10 @@
 @layer base {
     html {
         @apply selection:bg-main-color selection:text-bg-color;
+
+        :focus {
+            outline: none;
+        };
         
         font-family: Roboto Mono;
         ::-webkit-scrollbar {

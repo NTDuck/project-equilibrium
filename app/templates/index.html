@@ -1,15 +1,22 @@
 {% extends "base.html" %}
-{% from "macros.html" import todolistItem %}
+{% from "macros.html" import todolistItem, todolistComponent %}
 
 {% block content %}
-<div class="grid grid-cols-10 max-w-7xl h-full mx-auto px-8 gap-2">
+<div class="grid grid-cols-10 max-w-7xl h-full mx-auto px-8 gap-2 text-sub-color">
   <div class="col-span-2 flex flex-col items-center justify-center text-start gap-2">
-    <div class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto">
-      {% for task in tasks %}
-      {{ todolistItem(task)}}
+
+    {{ todolistComponent(outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolistItemContent", svgName="circle-plus") }}
+
+    {{ todolistComponent(outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="button", svgName="magnifying-glass") }}
+
+    <div id="todolist-list" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto">
+      {% for item in todolistItems %}
+      {{ todolistItem(content=item) }}
       {% endfor %}
     </div>
+
     <div class="flex-none h-20 w-full bg-sub-alt-color rounded-lg text-center">arbitrary value</div>
+
     <div class="flex-none h-20 w-full bg-sub-alt-color rounded-lg text-center">arbitrary value</div>
   </div>
 
@@ -17,4 +24,9 @@
   
   <div class="col-span-2 bg-sub-alt-color rounded-lg text-center">arbitrary value</div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}
