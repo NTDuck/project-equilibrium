@@ -7,11 +7,11 @@
 
     {{ todolistComponent(outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolistItemContent", svgName="circle-plus") }}
 
-    {{ todolistComponent(outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="button", svgName="magnifying-glass") }}
+    {{ todolistComponent(method="", outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="button", svgName="magnifying-glass") }}
 
     <div id="todolist-list" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto">
       {% for item in todolistItems %}
-      {{ todolistItem(content=item) }}
+      {{ todolistItem(content=item.value) }}
       {% endfor %}
     </div>
 
@@ -28,5 +28,5 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}

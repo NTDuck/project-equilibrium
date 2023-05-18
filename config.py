@@ -1,12 +1,9 @@
 
-import os
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-
 class Config:
     
     SECRET_KEY = "dev"
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # flask-moment
     MOMENT_USE_TZ = True
@@ -19,17 +16,17 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///data-dev.db"
 
 
 class TestingConfig(Config):
-
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///data-test.db"
 
 
 class ProductionConfig(Config):
-    pass
+    SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
 
 
 config = {

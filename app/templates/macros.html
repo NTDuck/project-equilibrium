@@ -28,17 +28,19 @@
 {% endmacro %}
 
 
-{% macro todoItemToggleBar() %}
-
-{% endmacro %}
-
-
 <!-- added undeclared classNames for DOM traversal -->
 {% macro todolistItem(content="") %}
 <div class="flex flex-row items-center py-2 px-4 w-full h-fit bg-sub-alt-color rounded-lg group todolist-item">
   <div class="flex-grow transition-all hover:text-text-color todolist-item-content">{{ content|e }}</div>
   <div class="flex flex-col flex-none opacity-0 text-sub-color group-hover:opacity-100 transition-all duration-300">
-    {{ svgBase(destUrl="#", svgName="trash-can", _divStyle="inline-block", _svgStyle="inline-block w-4 h-4 ml-2") }}
+    <form method="post" class="select-none transition-colors fill-current text-sub-color hover:text-text-color inline-block">
+      <input type="hidden" name="todolistItem_del" value="{{ content|e }}">
+      <button type="submit">
+        <svg class="fill-current inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['trash-can'].dimension }}">
+          {{ ICONS['trash-can'].path|safe }}
+        </svg>
+      </button>
+    </form>
     {{ svgBase(destUrl="#", svgName="clipboard_", _divStyle="inline-block", _aStyle="todolist-item-copyButton", _svgStyle="inline-block w-4 h-4 ml-2") }}
   </div>
   <span class="relative"></span>

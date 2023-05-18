@@ -22,6 +22,6 @@ TODOLIST_ITEMS = [
     "implement a bg-darken-popupmenu for some footer icons",
     "implement basic UI - index.html",
     "streaming the html",
-    "implement .flaskenv for public envs",
-    "implement search functions"
+    "flash messages into a bg-darken-popupmenu, enabled via noti button",
+    "make the host & port dynamic",
 ]

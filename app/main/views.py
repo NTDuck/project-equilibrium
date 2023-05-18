@@ -1,26 +1,40 @@
 
 from flask import (
-    render_template, request, url_for, redirect, session, 
+    render_template, request, url_for, redirect, 
 )
 
 from . import main
-from constant import TODOLIST_ITEMS
+from .. import db
+from ..models import TodolistItems
 
 
 @main.route("/", methods=["GET", "POST"])
 def index():
 
-    session["todolistItems"] = TODOLIST_ITEMS
+    is_data_modified = False
 
     if request.method == "POST":
 
-        todolistItemContent = request.form.get("todolistItemContent", "")
-        if not all([i.isspace() for i in todolistItemContent]):   # only append non-empty strings
-            session["todolistItems"].append(todolistItemContent)
-        
-        return redirect(url_for("main.index", todolistItems=session.get("todolistItems")))
+        if "todolistItemContent" in request.form:
+            todolistItemContent = request.form.get("todolistItemContent")
+            if not any([todolistItemContent.isspace(), len(todolistItemContent) == 0]):
+                todolistItem_to_add = TodolistItems(value=todolistItemContent)
+                db.session.add(todolistItem_to_add)
+                is_data_modified = True
+
+        if "todolistItem_del" in request.form:
+            todolistItem_del = request.form.get("todolistItem_del")
+            todolistItem_to_del = TodolistItems.query.filter_by(value=todolistItem_del).first()
+            db.session.delete(todolistItem_to_del)
+            is_data_modified = True
+
+        if is_data_modified:
+            db.session.commit()
+            db.session.close()
+            
+        return redirect(url_for("main.index"))
     
-    return render_template("index.html", todolistItems=session.get("todolistItems"))
+    return render_template("index.html", todolistItems=TodolistItems.query.all())
 
 
 @main.route("/about")

@@ -2,14 +2,23 @@
 import os
 
 import click
-from dotenv import load_dotenv
 
-from app import create_app
+from app import (
+    create_app, db, 
+)
+from app.models import TodolistItems
 
-
-load_dotenv()
 
 app = create_app(os.getenv("FLASK_CONFIG") or "default")
+
+# note-to-self: never modify this
+with app.app_context():
+    db.create_all()
+
+
+@app.shell_context_processor
+def shell_context_processor():
+    return dict(db=db, TodolistItems=TodolistItems)
 
 
 @app.cli.command()

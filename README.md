@@ -46,22 +46,7 @@ $ source venv/bin/activate
 ```
 Alternatively, for ensured version conflict/incompatibility:
 ```
-(venv) $ pip install flask flask-moment Flask-HTMLmin python-dotenv
-```
-Add the environment variables.
-```
-# windows
-(venv) $ set FLASK_APP=main
-(venv) $ set FLASK_DEBUG=1
-
-# macos/linux
-(venv) $ export FLASK_APP=main
-(venv) $ export FLASK_DEBUG=1
-```
-Alternatively, you can create a .env file under the root folder with the following content:
-```
-FLASK_APP=main
-FLASK_DEBUG=1
+(venv) $ pip install flask flask-moment flask-sqlalchemy flask-migrate Flask-HTMLmin python-dotenv
 ```
 
 ## Deployment
