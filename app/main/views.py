@@ -3,38 +3,28 @@ from flask import (
     render_template, request, url_for, redirect, 
 )
 
+from .utils import DbOperationHandler       
 from . import main
 from .. import db
-from ..models import TodolistItems
+from ..models import TodolistItem
+from constant import DEFAULT_TODOLIST_ITEM_VALUE
+
+
+todolistItemEventHandler = DbOperationHandler(request, db, TodolistItem, DEFAULT_TODOLIST_ITEM_VALUE)
 
 
 @main.route("/", methods=["GET", "POST"])
 def index():
-
-    is_data_modified = False
-
     if request.method == "POST":
-
-        if "todolistItemContent" in request.form:
-            todolistItemContent = request.form.get("todolistItemContent")
-            if not any([todolistItemContent.isspace(), len(todolistItemContent) == 0]):
-                todolistItem_to_add = TodolistItems(value=todolistItemContent)
-                db.session.add(todolistItem_to_add)
-                is_data_modified = True
-
+        if "todolistItem_add" in request.form:
+            todolistItemEventHandler.handle_db_insert("todolistItem_add")
+        if "todolistItem_edit" in request.form:
+            todolistItemEventHandler.handle_db_update("todolistItem_edit_prev", "todolistItem_edit")
         if "todolistItem_del" in request.form:
-            todolistItem_del = request.form.get("todolistItem_del")
-            todolistItem_to_del = TodolistItems.query.filter_by(value=todolistItem_del).first()
-            db.session.delete(todolistItem_to_del)
-            is_data_modified = True
-
-        if is_data_modified:
-            db.session.commit()
-            db.session.close()
-            
+            todolistItemEventHandler.handle_db_delete("todolistItem_del") 
         return redirect(url_for("main.index"))
-    
-    return render_template("index.html", todolistItems=TodolistItems.query.all())
+    return render_template("index.html", todolistItems=TodolistItem.query.all())
+
 
 
 @main.route("/about")

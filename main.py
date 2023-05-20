@@ -6,10 +6,11 @@ import click
 from app import (
     create_app, db, 
 )
-from app.models import TodolistItems
+from app.models import TodolistItem
 
 
 app = create_app(os.getenv("FLASK_CONFIG") or "default")
+
 
 # note-to-self: never modify this
 with app.app_context():
@@ -18,7 +19,7 @@ with app.app_context():
 
 @app.shell_context_processor
 def shell_context_processor():
-    return dict(db=db, TodolistItems=TodolistItems)
+    return dict(db=db, TodolistItems=TodolistItem)
 
 
 @app.cli.command()

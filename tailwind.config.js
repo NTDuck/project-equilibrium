@@ -20,8 +20,8 @@ module.exports = {
         'colorful-error-extra-color': '#7e2a33',
       },
       fontFamily: {
-        'Lexend-Deca': 'Lexend Deca'
-      }
+        'Lexend-Deca': 'Lexend Deca',
+      },
     },
   },
   variants: {

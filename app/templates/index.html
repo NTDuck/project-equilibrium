@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% from "macros.html" import todolistItem, todolistComponent %}
+{% from "macros.html" import todolistItem, todolistBar %}
 
 {% block content %}
 <div class="grid grid-cols-10 max-w-7xl h-full mx-auto px-8 gap-2 text-sub-color">
   <div class="col-span-2 flex flex-col items-center justify-center text-start gap-2">
 
-    {{ todolistComponent(outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolistItemContent", svgName="circle-plus") }}
+    {{ todolistBar(outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolistItem_add", svgName="circle-plus") }}
 
-    {{ todolistComponent(method="", outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="button", svgName="magnifying-glass") }}
+    {{ todolistBar(method="", outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="button", svgName="magnifying-glass") }}
 
-    <div id="todolist-list" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto">
+    <div id="todolist-list" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y">
       {% for item in todolistItems %}
       {{ todolistItem(content=item.value) }}
       {% endfor %}
@@ -28,5 +28,5 @@
 
 {% block scripts %}
 {{ super() }}
-<script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}

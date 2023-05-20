@@ -28,30 +28,49 @@
 {% endmacro %}
 
 
+{% macro svgTodolistItemForm(content="", svgName="", formClass="", inputName="", inputClass="", buttonClass="", buttonType="submit") %}
+<form method="post" class="select-none {{ formClass }}">
+  <input type="hidden" name="{{ inputName }}" class="{{ inputClass }}" value="{{ content|e }}">
+  <button type="{{ buttonType }}" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color {{ buttonClass }}">
+    <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS[svgName].dimension }}">
+      {{ ICONS[svgName].path|safe }}
+    </svg>
+  </button>
+</form>
+{% endmacro %}
+
+
 <!-- added undeclared classNames for DOM traversal -->
 {% macro todolistItem(content="") %}
-<div class="flex flex-row items-center py-2 px-4 w-full h-fit bg-sub-alt-color rounded-lg group todolist-item">
-  <div class="flex-grow transition-all hover:text-text-color todolist-item-content">{{ content|e }}</div>
-  <div class="flex flex-col flex-none opacity-0 text-sub-color group-hover:opacity-100 transition-all duration-300">
-    <form method="post" class="select-none transition-colors fill-current text-sub-color hover:text-text-color inline-block">
-      <input type="hidden" name="todolistItem_del" value="{{ content|e }}">
-      <button type="submit">
-        <svg class="fill-current inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['trash-can'].dimension }}">
-          {{ ICONS['trash-can'].path|safe }}
+<div class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 todolist-item">
+  <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-main-color todolist-item-content">{{ content|e }}</div>
+  <div class="flex flex-col flex-none justify-between pb-[1%] opacity-0 text-sub-color group-hover:opacity-100 transition-all duration-300">
+    <form method="post" class="select-none todolist-item-edit-form">
+      <input type="hidden" name="todolistItem_edit_prev" value="{{ content|e }}">
+      <input type="hidden" name="todolistItem_edit" class="todolist-item-edit-content" value="{{ content|e }}">
+      <button type="button" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color todolist-item-edit-button">
+        <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['pen-to-square_'].dimension }}">
+          {{ ICONS['pen-to-square_'].path|safe }}
         </svg>
       </button>
     </form>
-    {{ svgBase(destUrl="#", svgName="clipboard_", _divStyle="inline-block", _aStyle="todolist-item-copyButton", _svgStyle="inline-block w-4 h-4 ml-2") }}
+    <form method="post" class="select-none">
+      <input type="hidden" name="todolistItem_del" value="{{ content|e }}">
+      <button type="submit" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color">
+        <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['trash-can_'].dimension }}">
+          {{ ICONS['trash-can_'].path|safe }}
+        </svg>
+      </button>
+    </form>
   </div>
-  <span class="relative"></span>
 </div>
 {% endmacro %}
 
 
-{% macro todolistComponent(method="post", outerDivId="", inputId="", buttonId="", inputName="", buttonType="submit", svgName="") %}
+{% macro todolistBar(method="post", outerDivId="", inputId="", buttonId="", inputName="", buttonType="submit", svgName="") %}
 <form action="#" method="{{ method }}" class="flex-none h-fit w-full">
   <div id="{{ outerDivId }}" class="flex flex-row items-center py-2 px-4 bg-sub-alt-color transition-colors duration-300 rounded-lg">
-    <input type="text" name="{{ inputName }}" id="{{ inputId }}" class="flex-grow w-20 rounded-lg caret-transparent text-text-color bg-transparent transition-colors duration-300">
+    <input type="text" name="{{ inputName }}" id="{{ inputId }}" class="flex-grow w-20 rounded-lg caret-transparent text-text-color bg-transparent transition-colors duration-300 preventEnterKey">
     <button type="{{ buttonType }}" id="{{ buttonId }}" class="flex-none transition-colors duration-300 text-sub-color hover:text-text-color">
       <svg class="w-4 h-4 ml-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS[svgName].dimension }}">
         {{ ICONS[svgName].path|safe }}

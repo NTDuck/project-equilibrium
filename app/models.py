@@ -2,6 +2,6 @@
 from . import db
 
 
-class TodolistItems(db.Model):
+class TodolistItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    value = db.Column(db.String(128), unique=True)
+    value = db.Column(db.String(128), index=True, nullable=False)
