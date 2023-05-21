@@ -9,13 +9,13 @@ const todolistInputOuterDiv = document.getElementById('todolist-input-outerDiv')
 const todolistInputInput = document.getElementById('todolist-input-input');
 const todolistInputButton = document.getElementById('todolist-input-button');
 
-const todolistItemSearchOuterDiv = document.getElementById('todolist-search-outerDiv');
-const todolistItemSearchInput = document.getElementById('todolist-search-input');
-const todolistItemSearchButton = document.getElementById('todolist-search-button');
+const todolistSearchOuterDiv = document.getElementById('todolist-search-outerDiv');
+const todolistSearchInput = document.getElementById('todolist-search-input');
+const todolistSearchButton = document.getElementById('todolist-search-button');
 
 
 // simple search query
-todolistItemSearchButton.addEventListener('click', () => {
+todolistSearchButton.addEventListener('click', () => {
 
   // make sure all items are re-displayed between queries
   const todolistItems = document.querySelectorAll('.todolist-item');
@@ -24,7 +24,7 @@ todolistItemSearchButton.addEventListener('click', () => {
   });
 
   // get the search query
-  const todolistItemSearchQuery = todolistItemSearchInput.value.trim().toLowerCase();
+  const todolistItemSearchQuery = todolistSearchInput.value.trim().toLowerCase();
 
   // iterate over content of each item and hide/show based on search query
   if (todolistItemSearchQuery !== '') {
@@ -49,7 +49,7 @@ todolistItems.forEach(todolistItem => {
 
 // control color transition of search bars
 const TodolistBarInput = new utils.TodolistBarColorTransition(todolistInputOuterDiv, todolistInputInput, todolistInputButton);
-const TodolistBarSearch = new utils.TodolistBarColorTransition(todolistItemSearchOuterDiv, todolistItemSearchInput, todolistItemSearchButton);
+const TodolistBarSearch = new utils.TodolistBarColorTransition(todolistSearchOuterDiv, todolistSearchInput, todolistSearchButton);
 
 
 // prevent default enter key behavior in certain textinputs; refer to app/templates/macros.html
@@ -67,3 +67,9 @@ todolistItemContents.forEach(todolistItemContent => {
 
 // retain scroll progress of todolist between refreshes
 utils.retainScrollProgress(todolistItemList);
+
+
+// focus input bar if Ctrl+Shift+P is pressed
+// try this: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf
+utils.attachKeyBinding(todolistInputInput, true, true, false, 'P');
+utils.attachKeyBinding(todolistSearchInput, true, true, false, 'F');

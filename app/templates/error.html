@@ -1,16 +1,20 @@
 {% extends "base.html" %}
 
 
-{% block title %}equilibrium: {{ title }}{% endblock %}
+{% block title %}{{ err_name }}{% endblock %}
 
 {% block content %}
 <div class="grid grid-cols-2 place-content-center gap-4 max-w-2xl h-full mx-auto px-8">
   <div class="select-none">
-    <img src="{{ url_for('static', filename='/images/gifs/' + gifName + '.gif') }}" alt="error">
+    <img src="{{ url_for('static', filename='/images/gifs/' + gif_name) }}" alt="{{ gif_name }}" class="cursor-pointer" onclick="location.reload();">
   </div>
-  <div class="grid grid-cols-1 gap-4 h-full place-content-between place-items-center box-border">
-    <div class="text-7xl text-center text-main-color box-border">{{ err }}</div>
-    <div class="text-center line-clamp-4 overflow-y-auto">{{ description }}</div>
+  <div class="grid grid-cols-1 gap-4 h-full place-content-start place-items-center box-border">
+    <div class="text-7xl text-center font-Lexend-Deca text-text-color box-border">{{ err }}</div>
+    <div class="text-center overflow-y-auto">
+      <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/{{ err }}" target="_blank" class="">
+        {{ err_name }}
+      </a>
+    </div>
     <div class="select-none mt-4">
       <a href="{{ url_for('main.index') }}" class="block px-6 py-4 rounded-lg transition-colors text-text-color bg-sub-alt-color hover:bg-text-color hover:text-bg-color box-border fill-current">
         <svg class="w-4 h-4 mb-[.3rem] inline-block fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">

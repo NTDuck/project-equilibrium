@@ -2,7 +2,7 @@
 
 class DbOperationHandler:
 
-    def __init__(self, request, db, column, default_values):
+    def __init__(self, request, db, column, default_values=[]):
         self.request = request
         self.db = db
         self.column = column

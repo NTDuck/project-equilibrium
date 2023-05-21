@@ -177,3 +177,18 @@ export function retainScrollProgress(element) {
   window.addEventListener('beforeunload', saveScrollPosition);
   window.addEventListener('load', restoreScrollPosition);
 }
+
+
+export function attachKeyBinding(element, isCtrl, isShift, isAlt, key) {
+  document.addEventListener('keydown', function(event) {
+    if (
+      (!isCtrl || (event.ctrlKey || event.metaKey)) &&
+      (!isShift || event.shiftKey) &&
+      (!isAlt || event.altKey) &&
+      event.key === key
+    ) {
+      event.preventDefault();
+      element.focus();
+    }
+  });
+}
