@@ -41,9 +41,10 @@ const todolistItems = document.querySelectorAll('.todolist-item');
 
 todolistItems.forEach(todolistItem => {
   const todolistItemContent = todolistItem.querySelector('.todolist-item-content');
+  const todolistItemEditForm = todolistItem.querySelector('.todolist-item-edit-form');
   const todolistItemEditButton = todolistItem.querySelector('.todolist-item-edit-button');
 
-  const TodolistItemTransition = new utils.TodolistItemColorTransition(todolistItem, todolistItemContent, todolistItemEditButton);
+  const TodolistItemTransition = new utils.TodolistItemColorTransition(todolistItem, todolistItemContent, todolistItemEditForm, todolistItemEditButton);
 });
 
 

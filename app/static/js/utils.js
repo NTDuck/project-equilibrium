@@ -57,9 +57,10 @@ export class TodolistBarColorTransition {
 
 
 export class TodolistItemColorTransition {
-  constructor(outerDiv, contentDiv, button) {
+  constructor(outerDiv, contentDiv, formDiv, button) {
     this.outerDiv = outerDiv;
     this.contentDiv = contentDiv;
+    this.formDiv = formDiv;
     this.button = button;
 
     this.addEventListeners();
@@ -67,7 +68,8 @@ export class TodolistItemColorTransition {
 
   addEventListeners() {
     this.button.addEventListener('click', this.toggleEditable.bind(this));
-    this.contentDiv.addEventListener('keydown', this.handleKeyDown.bind(this));
+    this.button.addEventListener('focus', this.handleButtonFocus.bind(this));
+    document.addEventListener('keydown', this.handleKeyDown.bind(this));
     document.addEventListener('click', this.handleDocumentClick.bind(this));
   }
 
@@ -75,6 +77,7 @@ export class TodolistItemColorTransition {
     const isEditable = this.contentDiv.getAttribute('contenteditable') === 'true';
     if (isEditable) {
       this.contentDiv.setAttribute('contenteditable', 'false');
+      // change the value of a hidden input field
       const inputContent = this.button.closest('.todolist-item-edit-form').querySelector('.todolist-item-edit-content');
       inputContent.value = this.contentDiv.innerText;
       this.button.setAttribute('type', 'submit');
@@ -88,26 +91,23 @@ export class TodolistItemColorTransition {
   }
 
   updateStyles(isEditable) {
-    const outerDivClasses = ['bg-sub-alt-color', 'bg-sub-color'];
-    const contentDivClasses = ['text-sub-color', 'hover:text-text-color', 'focus:text-text-color', 'text-text-color'];
-    const buttonClasses = ['text-sub-color', 'hover:text-text-color', 'focus:text-text-color', 'text-text-color'];
-  
     if (isEditable) {
-      this.outerDiv.classList.remove(...outerDivClasses);
+      this.outerDiv.classList.remove('bg-sub-alt-color');
       this.outerDiv.classList.add('bg-sub-color');
-      this.contentDiv.classList.remove(...contentDivClasses);
-      this.contentDiv.classList.add('text-text-color');
-      this.button.classList.remove(...buttonClasses);
-      this.button.classList.add('text-text-color');
+      this.contentDiv.classList.remove('text-sub-color', 'hover:text-text-color', 'focus:text-text-color');
+      this.contentDiv.classList.add('text-main-color', 'focus:text-text-color');
+      this.formDiv.classList.remove('opacity-0', 'group-hover:opacity-100');
+      this.button.classList.add('text-text-color', 'focus:text-main-color');
     } else {
-      this.outerDiv.classList.remove(...outerDivClasses);
+      this.outerDiv.classList.remove('bg-sub-color');
       this.outerDiv.classList.add('bg-sub-alt-color');
-      this.contentDiv.classList.remove('text-text-color');
-      this.contentDiv.classList.add(...contentDivClasses);
-      this.button.classList.remove('text-text-color');
-      this.button.classList.add(...buttonClasses);
+      this.contentDiv.classList.remove('text-main-color', 'focus:text-text-color');
+      this.contentDiv.classList.add('text-sub-color', 'hover:text-text-color', 'focus:text-text-color');
+      this.formDiv.classList.add('opacity-0', 'group-hover:opacity-100');
+      this.button.classList.remove('text-text-color', 'focus:text-main-color');
+      this.button.classList.add('text-sub-color', 'hover:text-text-color', 'focus:text-text-color');
     }
-  }  
+  }
 
   setCaretToEnd(element) {
     const range = document.createRange();
@@ -118,12 +118,37 @@ export class TodolistItemColorTransition {
     selection.addRange(range);
   }
 
+  handleButtonFocus(event) {
+    const isEditable = this.contentDiv.getAttribute('contenteditable') === 'true';
+    const isTabKey = event.key === 'Tab';
+    if (isEditable && !isTabKey) {
+      this.outerDiv.classList.remove('bg-sub-color');
+      this.outerDiv.classList.add('bg-sub-alt-color');
+      this.contentDiv.addEventListener('focus', this.handleContentDivFocus.bind(this));
+    } else {
+      this.outerDiv.classList.remove('bg-sub-alt-color');
+      this.outerDiv.classList.add('bg-sub-color');
+    }
+  }
+
+  handleContentDivFocus() {
+    const isEditable = this.contentDiv.getAttribute('contenteditable') === 'true';
+    if (isEditable) {
+      this.outerDiv.classList.remove('bg-sub-alt-color');
+      this.outerDiv.classList.add('bg-sub-color');
+      this.contentDiv.addEventListener('focus', this.handleContentDivFocus.bind(this));
+    } else {
+      this.outerDiv.classList.remove('bg-sub-alt-color');
+      this.outerDiv.classList.add('bg-sub-color');
+    }
+
+  }
+
   // reloads if Esc pressed in contenteditable mode
   handleKeyDown(event) {
     const isEditable = this.contentDiv.getAttribute('contenteditable') === 'true';
-    const key = event.key;
-
-    if (isEditable && (key === 'Escape' || key === 'Esc')) {
+    if (isEditable && event.key === 'Escape' || event.key === 'Esc') {
+      event.preventDefault();
       location.reload();
     }
   }
@@ -138,7 +163,6 @@ export class TodolistItemColorTransition {
     }
   }
 }
-
 
 
 export function preventDefaultEnterKeyBehavior(element) {

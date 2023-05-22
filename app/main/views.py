@@ -1,7 +1,5 @@
 
-from flask import (
-    render_template, request, url_for, redirect, abort, 
-)
+from flask import render_template, request, url_for, redirect
 
 from . import main
 from .. import db
@@ -23,6 +21,7 @@ def index():
         if "todolistItem_del" in request.form:
             todolistItemEventHandler.handle_db_delete("todolistItem_del")
         return redirect(url_for("main.index"))
+        
     return render_template("index.html", todolistItems=TodolistItem.query.all())
 
 

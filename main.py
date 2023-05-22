@@ -3,9 +3,7 @@ import os
 
 import click
 
-from app import (
-    create_app, db, 
-)
+from app import create_app, db
 from app.models import TodolistItem
 
 

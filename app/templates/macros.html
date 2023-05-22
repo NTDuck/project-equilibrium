@@ -44,7 +44,7 @@
 {% macro todolistItem(content="") %}
 <div class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 todolist-item">
   <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-main-color todolist-item-content">{{ content|e }}</div>
-  <div class="flex flex-col flex-none justify-between pb-[1%] opacity-0 text-sub-color group-hover:opacity-100 transition-all duration-300">
+  <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-300 todolist-item-edit-form">
     <form method="post" class="select-none todolist-item-edit-form">
       <input type="hidden" name="todolistItem_edit_prev" value="{{ content|e }}" autocomplete="off">
       <input type="hidden" name="todolistItem_edit" class="todolist-item-edit-content" value="{{ content|e }}" autocomplete="off">

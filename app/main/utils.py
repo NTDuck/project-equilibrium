@@ -1,5 +1,4 @@
 
-
 class DbOperationHandler:
 
     def __init__(self, request, db, column, default_values=[]):
