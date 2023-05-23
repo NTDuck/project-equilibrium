@@ -46,7 +46,7 @@ $ source venv/bin/activate
 ```
 Alternatively, for ensured version conflict/incompatibility:
 ```
-(venv) $ pip install flask flask-moment flask-sqlalchemy flask-migrate Flask-HTMLmin python-dotenv
+(venv) $ pip install flask flask-moment flask-sqlalchemy flask-migrate Flask-HTMLmin flask-socketio python-dotenv
 ```
 
 ## Deployment

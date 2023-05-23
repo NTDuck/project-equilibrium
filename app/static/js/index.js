@@ -1,9 +1,6 @@
 
-import * as utils from './utils.js';
+import * as utils from './utils/utils.js';
 
-
-const todolistItemList = document.getElementById('todolist-list');
-const todolistItemContents = todolistItemList.querySelectorAll('.todolist-item-content');
 
 const todolistInputOuterDiv = document.getElementById('todolist-input-outerDiv');
 const todolistInputInput = document.getElementById('todolist-input-input');
@@ -12,28 +9,6 @@ const todolistInputButton = document.getElementById('todolist-input-button');
 const todolistSearchOuterDiv = document.getElementById('todolist-search-outerDiv');
 const todolistSearchInput = document.getElementById('todolist-search-input');
 const todolistSearchButton = document.getElementById('todolist-search-button');
-
-
-// simple search query
-todolistSearchButton.addEventListener('click', () => {
-
-  // make sure all items are re-displayed between queries
-  const todolistItems = document.querySelectorAll('.todolist-item');
-  todolistItems.forEach(todolistItem => {
-    todolistItem.style.removeProperty('display');
-  });
-
-  // get the search query
-  const todolistItemSearchQuery = todolistSearchInput.value.trim().toLowerCase();
-
-  // iterate over content of each item and hide/show based on search query
-  if (todolistItemSearchQuery !== '') {
-    for (let i = 0; i < todolistItemContents.length; i++) {
-      const todolistItemContentText = todolistItemContents[i].textContent.toLowerCase();
-      if (!todolistItemContentText.includes(todolistItemSearchQuery)) {
-        todolistItemContents[i].closest('.todolist-item').style.display = 'none';
-  }}}
-})
 
 
 // simple edit toggle
@@ -53,24 +28,47 @@ const TodolistBarInput = new utils.TodolistBarColorTransition(todolistInputOuter
 const TodolistBarSearch = new utils.TodolistBarColorTransition(todolistSearchOuterDiv, todolistSearchInput, todolistSearchButton);
 
 
-// prevent default enter key behavior in certain textinputs; refer to app/templates/macros.html
-const preventEnterKeyItems = document.getElementsByClassName('preventEnterKey');
-for (const preventEnterKeyItem of preventEnterKeyItems) {
-  utils.preventDefaultEnterKeyBehavior(preventEnterKeyItem);
-}
+$(document).ready(function() {
+  // search query
+  $("#todolist-search-button").click(function() {
+    $(".todolist-item").fadeOut(300);
+    const todolistItemSearchQuery = $("#todolist-search-input").val().toLowerCase().trim();
+    if (todolistItemSearchQuery !== '') {
+      $(".todolist-item-content").each(function() {
+        if ($(this).text().toLowerCase().includes(todolistItemSearchQuery)) {
+          $(this).closest('.todolist-item').fadeIn(300);
+        }
+      });
+    }
+  });
 
+  // copy item's content to clipboard when clicked
+  $(".todolist-item-content").each(function() {
+    $(this).click(function() {
+      navigator.clipboard
+        .writeText($(this).text())
+        .catch(function(error) {
+          console.error("Clipboard API error: ", error)
+        })
+    });
+  });
 
-// copy item's content to clipboard when clicked
-todolistItemContents.forEach(todolistItemContent => {
-  utils.attachCopyToClipboardListener(todolistItemContent);
+  // retain scroll progress of todolist between refreshes
+  $("#todolist-list").scrollTop(localStorage.getItem("todolistScrollPosition"));
+  $("#todolist-list").scroll(function() {
+    localStorage.setItem("todolistScrollPosition", $(this).scrollTop());
+  });
+
+  // prevent default enter key behavior in specified elements (todolist bars)
+  $(".preventEnterKey").each(function() {
+    $(this).keypress(function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+      }
+    });
+  });
+
+  // focus certain elements on certain keyboard events
+  utils.handleKeydownEvent($("#todolist-input-input"), true, true, false, "P");
+  utils.handleKeydownEvent($("#todolist-search-input"), false, true, true, "F");
 })
-
-
-// retain scroll progress of todolist between refreshes
-utils.retainScrollProgress(todolistItemList);
-
-
-// focus input bar if Ctrl+Shift+P is pressed
-// try this: https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf
-utils.attachKeyBinding(todolistInputInput, true, true, false, 'P');
-utils.attachKeyBinding(todolistSearchInput, true, true, false, 'F');

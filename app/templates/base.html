@@ -24,7 +24,7 @@
 </head>
 <body class="flex flex-col h-screen bg-bg-color text-sub-color transition-all antialiased">
 
-  <nav class="flex-none select-none h-24 bg-bg-color">
+  <nav class="flex-none select-none h-24 bg-bg-color hidden">
     <div class="flex flex-row items-center justify-between max-w-7xl h-full mx-auto px-8">
       <div class="select-none fill-current text-text-color hover:text-main-color transition-colors duration-300 mr-2">
         <a href="{{ url_for('main.index') }}">
@@ -47,12 +47,12 @@
     </div>
   </nav>
 
-  <main class="flex-grow">
+  <main class="flex-grow hidden">
     {% block content %}
     {% endblock %}
   </main>
 
-  <footer class="flex-none select-none h-28 mt-4">
+  <footer class="flex-none select-none h-28 mt-4 hidden">
     <div class="flex flex-col text-center max-w-7xl mx-auto px-8 pt-4 text-xs">
       <div class="leading-5 mb-4 px-[.1rem] group">
         {{ footerKey("esc") }} or {{ footerKey("ctrl") }}+{{ footerKey("shift") }}+{{ footerKey("p") }} - command line
@@ -72,7 +72,9 @@
   </footer>
 
   {% block scripts %}
+  <script src="{{ url_for('static', filename='js/vendor/jquery-3.7.0.min.js') }}"></script>
   <!-- {{ moment.include_moment() }} -->
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   {% endblock scripts %}
 </body>
 </html>

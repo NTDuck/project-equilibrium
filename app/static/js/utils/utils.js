@@ -165,46 +165,8 @@ export class TodolistItemColorTransition {
 }
 
 
-export function preventDefaultEnterKeyBehavior(element) {
-  element.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-    }
-  });
-}
-
-
-export function attachCopyToClipboardListener(element) {
-  element.addEventListener('click', () => {
-    navigator.clipboard
-      .writeText(element.textContent)
-      .catch((error) => {
-        console.error("Clipboard API error: ", error)
-      });
-  })
-}
-
-
-export function retainScrollProgress(element) {
-
-  function saveScrollPosition() {
-    localStorage.setItem('scrollPosition', element.scrollTop);
-  }
-
-  function restoreScrollPosition() {
-    const scrollPosition = localStorage.getItem('scrollPosition');
-    if (scrollPosition) {
-      element.scrollTop = scrollPosition;
-    }
-  }
-
-  window.addEventListener('beforeunload', saveScrollPosition);
-  window.addEventListener('load', restoreScrollPosition);
-}
-
-
-export function attachKeyBinding(element, isCtrl, isShift, isAlt, key) {
-  document.addEventListener('keydown', function(event) {
+export function handleKeydownEvent(element, isCtrl=false, isShift=false, isAlt=false, key) {
+  $(document).keydown(function(event) {
     if (
       (!isCtrl || (event.ctrlKey || event.metaKey)) &&
       (!isShift || event.shiftKey) &&
