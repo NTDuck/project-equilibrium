@@ -12,5 +12,5 @@ from . import main
 def errorhandler(e):
     err = getattr(e, "code", 500)
     err_name = getattr(e, "name", "something went wrong").lower()
-    gif_name = random.choice(os.listdir(os.path.join(os.path.dirname(__file__), "../static/images/gifs")))   # credit: https://www.pixiv.net/en/users/16274829
+    gif_name = random.choice(os.listdir(os.path.join(os.path.dirname(__file__), "../static/images/gifs/error")))   # credit: https://www.pixiv.net/en/users/16274829
     return render_template("error.html", err=err, err_name=err_name, gif_name=gif_name), err

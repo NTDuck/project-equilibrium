@@ -24,7 +24,7 @@
 
 
 {% macro footerKey(key) %}
-<span class="transition-colors rounded-[.1rem] px-[.3rem] py-[.1rem] mx-[.25rem] leading-[.7rem] text-[.7rem] bg-sub-color text-bg-color hover:bg-text-color">{{ key }}</span>
+<span class="rounded-[.1rem] px-[.3rem] py-[.1rem] mx-[.25rem] leading-[.7rem] text-[.7rem] bg-sub-color text-bg-color">{{ key }}</span>
 {% endmacro %}
 
 
@@ -37,6 +37,15 @@
     </svg>
   </button>
 </form>
+{% endmacro %}
+
+
+{% macro svgTimerButton(svgName="", buttonId="") %}
+<button id="{{ buttonId }}" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color">
+  <svg class="fill-current inline-block w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS[svgName].dimension }}">
+    {{ ICONS[svgName].path|safe }}
+  </svg>
+</button>
 {% endmacro %}
 
 

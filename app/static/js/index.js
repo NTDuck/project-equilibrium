@@ -1,33 +1,8 @@
 
-import * as utils from './utils/utils.js';
+import { TodolistBarColorTransition, TodolistItemColorTransition, Timer, handleKeydownEvent } from './utils.js';
 
 
-const todolistInputOuterDiv = document.getElementById('todolist-input-outerDiv');
-const todolistInputInput = document.getElementById('todolist-input-input');
-const todolistInputButton = document.getElementById('todolist-input-button');
-
-const todolistSearchOuterDiv = document.getElementById('todolist-search-outerDiv');
-const todolistSearchInput = document.getElementById('todolist-search-input');
-const todolistSearchButton = document.getElementById('todolist-search-button');
-
-
-// simple edit toggle
-const todolistItems = document.querySelectorAll('.todolist-item');
-
-todolistItems.forEach(todolistItem => {
-  const todolistItemContent = todolistItem.querySelector('.todolist-item-content');
-  const todolistItemEditForm = todolistItem.querySelector('.todolist-item-edit-form');
-  const todolistItemEditButton = todolistItem.querySelector('.todolist-item-edit-button');
-
-  const TodolistItemTransition = new utils.TodolistItemColorTransition(todolistItem, todolistItemContent, todolistItemEditForm, todolistItemEditButton);
-});
-
-
-// control color transition of search bars
-const TodolistBarInput = new utils.TodolistBarColorTransition(todolistInputOuterDiv, todolistInputInput, todolistInputButton);
-const TodolistBarSearch = new utils.TodolistBarColorTransition(todolistSearchOuterDiv, todolistSearchInput, todolistSearchButton);
-
-
+// prevent running jQuery code before finish loading document
 $(document).ready(function() {
   // search query
   $("#todolist-search-button").click(function() {
@@ -69,6 +44,25 @@ $(document).ready(function() {
   });
 
   // focus certain elements on certain keyboard events
-  utils.handleKeydownEvent($("#todolist-input-input"), true, true, false, "P");
-  utils.handleKeydownEvent($("#todolist-search-input"), false, true, true, "F");
-})
+  handleKeydownEvent($("#todolist-input-input"), true, true, false, "P");
+  handleKeydownEvent($("#todolist-search-input"), false, true, true, "F");
+
+  // control color transition of search bars
+  const TodolistBarInput = new TodolistBarColorTransition($("#todolist-input-outerDiv"), $("#todolist-input-input"), $("#todolist-input-button"));
+  const TodolistBarSearch = new TodolistBarColorTransition($("#todolist-search-outerDiv"), $("#todolist-search-input"), $("#todolist-search-button"));
+  
+  // control color transition of items on "edit" toggle
+  const todolistItems = document.querySelectorAll('.todolist-item');
+
+  todolistItems.forEach(todolistItem => {
+    const todolistItemContent = todolistItem.querySelector('.todolist-item-content');
+    const todolistItemEditForm = todolistItem.querySelector('.todolist-item-edit-form');
+    const todolistItemEditButton = todolistItem.querySelector('.todolist-item-edit-button');
+  
+    const TodolistItemTransition = new TodolistItemColorTransition(todolistItem, todolistItemContent, todolistItemEditForm, todolistItemEditButton);
+  });
+
+  // control timer
+  const timer = new Timer($("#timer-button-play"), $("#timer-button-pause"), $("#timer-button-skip"), $("#timer-display-number"), $("#timer-display-progress"), $("#timer-display-container"), 25, 5, 15, 4, 1000);
+  
+});
