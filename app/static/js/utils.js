@@ -153,40 +153,122 @@ export class TodolistItemColorTransition {
 
 
 export class Timer {
-  constructor(playButton, pauseButton, skipButton, numberDiv, progressDiv, containerDiv, workSessionLength, shortBreakSessionLength, longBreakSessionLength, PomodoroInterval, timerCountSpeed) {
+  constructor(playButton, pauseButton, skipButton, numberDiv, progressDiv, containerDiv, image) {
     this.playButton = playButton;
     this.pauseButton = pauseButton;
     this.skipButton = skipButton;
     this.numberDiv = numberDiv;
     this.progressDiv = progressDiv;
     this.containerDiv = containerDiv;
-
-    this.workSessionLength = workSessionLength * 60;
-    this.shortBreakSessionLength = shortBreakSessionLength * 60;
-    this.longBreakSessionLength = longBreakSessionLength * 60;
-    this.PomodoroInterval = PomodoroInterval;
-    this.timerCountSpeed = timerCountSpeed;   // milliseconds
+    this.image = image;
 
     this.maxWidth = this.containerDiv.width();
     this.timerInterval = null;
-    this.timerState = "paused";
-    this.currentSession = "work";
-    this.sessionsCompleted = 0;
-    this.timerCount = this.workSessionLength;  // Initial timer count set to work session duration
-    this.timerCountMax = this.timerCount;
+    this.audioFolder = "/static/audio/session_complete_notify";
 
+    this.init();
+  }
+  
+  init() {
     this.addEventListeners();
-    this.initialDisplaySetup();
+    this.prepareTimerConfig();
+    this.prepareAudio();
   }
 
   addEventListeners() {
     this.playButton.click(this.toggleState.bind(this));
     this.pauseButton.click(this.toggleState.bind(this));
     this.skipButton.click(this.skip.bind(this));
+    window.addEventListener("beforeunload", this.saveProgress.bind(this));
   }
 
-  initialDisplaySetup() {
-    this.updateDisplay();
+  // warning: fetch request not fully resolved when called
+  prepareTimerConfig() {
+    fetch("/api/timer-config")
+      .then(response => response.json())
+      .then(timerConfigs => {
+        this.workSessionLength = timerConfigs["work"] * 60;
+        this.shortBreakSessionLength = timerConfigs["short_break"] * 60;
+        this.longBreakSessionLength = timerConfigs["long_break"] * 60;
+        this.pomodoroInterval = timerConfigs["interval"];
+        this.timerCountSpeed = timerConfigs["delay"];
+      })
+      .then(() => {
+        // part of constructor, placed here to prevent fetch request not fully resolved
+        this.timerState = "paused";
+        this.currentSession = "work";
+        this.sessionsCompleted = 0;
+        this.timerCount = this.workSessionLength;
+        this.timerCountMax = this.timerCount;
+      })
+      .then(() => {
+        this.loadSavedProgress();
+      })
+      .then(() => {
+        this.updateDisplay();
+      })
+      .catch(error => {
+        console.error("Error retrieving timer config values:", error);
+      });
+  }
+
+  // warning: fetch request not fully resolved when called
+  prepareAudio() {
+    // complete the api endpoint
+    let apiRouteParam = this.audioFolder.split("/").pop();
+    fetch(`/api/audio-files/${apiRouteParam}`)
+      .then(response => response.json())
+      .then(audioFiles => {
+        // retrieve all files in designated folder
+        this.audio = audioFiles.map(fileUrl => new Audio(`${this.audioFolder}/${fileUrl}`));
+      })
+      .catch(error => {
+        console.error("Error retrieving audio files:", error);
+      });
+  }
+
+  playAudio() {
+    // play random audio file from list
+    let selectedAudio = Math.floor(Math.random() * this.audio.length);
+    this.audio[selectedAudio].play();
+  }
+
+  loadSavedProgress() {
+    const savedProgress = JSON.parse(localStorage.getItem("timerProgress"));
+    if (savedProgress) {
+      this.timerState = savedProgress.timerState;
+      this.currentSession = savedProgress.currentSession;
+      this.sessionsCompleted = savedProgress.sessionsCompleted;
+      this.timerCount = savedProgress.timerCount;
+      this.timerCountMax = savedProgress.timerCountMax;
+    }
+  }
+
+  saveProgress() {
+    const progressData = {
+      timerState: "paused",   // make sure always paused when page gets reloaded
+      currentSession: this.currentSession,
+      sessionsCompleted: this.sessionsCompleted,
+      timerCount: this.timerCount,
+      timerCountMax: this.timerCountMax,
+    };
+    localStorage.setItem("timerProgress", JSON.stringify(progressData));
+  }
+
+  changeGifSrc() {
+    const path = this.image.attr("src");
+    const dirName = path.slice(0, path.lastIndexOf("/") + 1);
+    if (this.timerState === "paused") {
+      this.image.attr("src", `${dirName}ht.gif`);
+    } else {
+      if (this.currentSession === "work") {
+        this.image.attr("src", `${dirName}bbg_zzz230407.gif`);
+      } else if (this.currentSession === "shortBreak") {
+        this.image.attr("src", `${dirName}gb_genshin230328.gif`);
+      } else {
+        this.image.attr("src", `${dirName}di2.gif`);
+      }
+    }
   }
 
   start() {
@@ -199,35 +281,40 @@ export class Timer {
         this.timerCount--;
       }
     }, this.timerCountSpeed);
+    this.changeGifSrc();
   }
 
   stop() {
     clearInterval(this.timerInterval);
+    this.changeGifSrc();
   }
 
   skip() {
     this.stop();
     this.sessionComplete();
+    this.changeGifSrc();
   }
 
   sessionComplete() {
     if (this.currentSession === "work") {
       this.sessionsCompleted++;
-      if (this.sessionsCompleted >= this.PomodoroInterval) {
-        this.sessionsCompleted = 0;
+      if (this.sessionsCompleted >= this.pomodoroInterval) {
         this.currentSession = "longBreak";
         this.timerCount = this.longBreakSessionLength;
+        this.sessionsCompleted = 0;
       } else {
         this.currentSession = "shortBreak";
         this.timerCount = this.shortBreakSessionLength;
       }
-    } else if (this.currentSession === "shortBreak" || this.currentSession === "longBreak") {
+    } else if (this.currentSession !== "work") {
       this.currentSession = "work";
       this.timerCount = this.workSessionLength;
     }
     this.timerCountMax = this.timerCount;
     this.timerState = "paused";
     this.updateDisplay();
+    this.changeGifSrc();
+    this.playAudio();
   }
 
   updateDisplay() {
@@ -250,13 +337,18 @@ export class Timer {
     // update element colors
     if (this.timerState === "paused") {
       this.numberDiv.fadeIn(300);
-      this.progressDiv.removeClass("bg-text-color").addClass("bg-sub-color");
+      this.progressDiv.removeClass("bg-text-color bg-main-color").addClass("bg-sub-color");
       this.containerDiv.removeClass("bg-sub-color").addClass("bg-bg-color");
       this.pauseButton.hide();
+      this.pauseButton.removeClass("text-sub-color").addClass("text-text-color");
       this.playButton.show();
     } else {
       this.numberDiv.fadeOut(300);
-      this.progressDiv.removeClass("bg-sub-color").addClass("bg-text-color");
+      if (this.currentSession === "work") {
+        this.progressDiv.removeClass("bg-sub-color bg-text-color").addClass("bg-main-color");
+      } else {
+        this.progressDiv.removeClass("bg-sub-color bg-main-color").addClass("bg-text-color");
+      }
       this.containerDiv.removeClass("bg-bg-color").addClass("bg-sub-color");
       this.playButton.hide();
       this.pauseButton.show();

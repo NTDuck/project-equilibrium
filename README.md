@@ -72,6 +72,12 @@ Press CTRL+C to quit
 [MIT](LICENSE)
 
 
+## Acknowledgements
+
+- Gifs from [Seseren](https://www.pixiv.net/en/users/16274829).
+- Audio by Herta from Honkai: Star Rail.
+
+
 ## Support
 
 If you wish to support further development and feel extra awesome, you can [buy me a coffee](https://www.buymeacoffee.com/ntduck).

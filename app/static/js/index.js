@@ -52,6 +52,7 @@ $(document).ready(function() {
   const TodolistBarSearch = new TodolistBarColorTransition($("#todolist-search-outerDiv"), $("#todolist-search-input"), $("#todolist-search-button"));
   
   // control color transition of items on "edit" toggle
+  // warning: not yet implemented into jquery, will do in future versions
   const todolistItems = document.querySelectorAll('.todolist-item');
 
   todolistItems.forEach(todolistItem => {
@@ -63,6 +64,5 @@ $(document).ready(function() {
   });
 
   // control timer
-  const timer = new Timer($("#timer-button-play"), $("#timer-button-pause"), $("#timer-button-skip"), $("#timer-display-number"), $("#timer-display-progress"), $("#timer-display-container"), 25, 5, 15, 4, 1000);
-  
+  const timer = new Timer($("#timer-button-play"), $("#timer-button-pause"), $("#timer-button-skip"), $("#timer-display-number"), $("#timer-display-progress"), $("#timer-display-container"), $("#timer-display-gif"));
 });
