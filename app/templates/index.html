@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% from "macros.html" import todolistItem, todolistBar, svgTimerButton %}
+{% from "macros.html" import svgNavbar, todolistItem, todolistBar, svgTimerButton, svgUserDataButton %}
 
 {% block content %}
 <div class="grid grid-cols-10 max-w-7xl h-full mx-auto px-8 gap-2 text-sub-color">
   <div class="col-span-2 flex flex-col items-center justify-center text-start gap-2">
 
-    {{ todolistBar(outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolistItem_add", svgName="circle-plus") }}
+    {{ todolistBar(outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolist-item-add", svgName="circle-plus") }}
 
     {{ todolistBar(method="", outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="button", svgName="magnifying-glass") }}
 
@@ -15,11 +15,17 @@
       {% endfor %}
     </div>
 
-    <div class="flex flex-none items-center justify-center h-20 w-full rounded-lg bg-sub-alt-color">
-      <h2 id="timer-display-number" class="text-main-color"></h2>
+    <div class="flex flex-col flex-none items-center justify-center w-full h-20 rounded-lg bg-sub-alt-color text-main-color">
+      <h2 id="timer-display-number"></h2>
     </div>
 
-    <div class="flex-none h-20 w-full bg-sub-alt-color rounded-lg text-center">
+    <div class="flex flex-row flex-none items-center justify-evenly w-full h-20 bg-sub-alt-color rounded-lg">
+      {{ svgNavbar("api.download_user_data", "floppy-disk") }}
+      {{ svgNavbar("api.delete_user_data", "trash-can_") }}
+      {{ svgUserDataButton("upload", "user-data-upload-button") }}
+      <form id="user-data-upload-form" action="{{ url_for('api.upload_user_data') }}" method="post" enctype="multipart/form-data" class="hidden">
+        <input id="user-data-upload-input" type="file" name="user-data">
+      </form>
     </div>
   </div>
 
@@ -28,7 +34,7 @@
       <div id="timer-display-container" class="w-2/3 h-8 p-1 rounded-lg transition-colors bg-bg-color">
         <div id="timer-display-progress" class="max-w-full h-full rounded-md transition-colors duration-300 bg-sub-color"></div>
       </div>
-    <img id="timer-display-gif" src="{{ url_for('static', filename='/images/gifs/pomodoro/ht.gif') }}" class="w-2/3 rounded-lg">
+    <img id="timer-display-gif" src="{{ url_for('static', filename='/images/gifs/timer/paused/ht.gif') }}" class="w-2/3 rounded-lg select-none">
     </div>
     <div class="flex flex-row flex-none h-20 items-center justify-center gap-4">
       {{ svgTimerButton(svgName="pause", buttonId="timer-button-pause") }}

@@ -1,4 +1,4 @@
-{% from "constant.html" import ICONS %}
+{% from "constants.html" import ICONS, API_ROUTES %}
 
 
 {% macro svgBase(destUrl="#", isAbsolute=1, svgName="", target="_self", useText="", _divStyle="", _aStyle="", _svgStyle="") %}
@@ -10,6 +10,15 @@
     {{ useText }}
   </a>
 </div>
+{% endmacro %}
+
+
+{% macro svgBaseButton(svgName="", svgClass="", buttonId="") %}
+<button id="{{ buttonId }}" class="transition-colors fill-current text-sub-color hover:text-text-color">
+  <svg class="fill-current {{ svgClass }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS[svgName].dimension }}">
+    {{ ICONS[svgName].path|safe }}
+  </svg>
+</button>
 {% endmacro %}
 
 
@@ -29,7 +38,7 @@
 
 
 {% macro svgTodolistItemForm(content="", svgName="", formClass="", inputName="", inputClass="", buttonClass="", buttonType="submit") %}
-<form method="post" class="select-none {{ formClass }}">
+<form action="{{ API_ROUTES['todolist'] }}" method="post" class="select-none {{ formClass }}">
   <input type="hidden" name="{{ inputName }}" class="{{ inputClass }}" value="{{ content|e }}" autocomplete="off">
   <button type="{{ buttonType }}" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color {{ buttonClass }}">
     <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS[svgName].dimension }}">
@@ -41,30 +50,31 @@
 
 
 {% macro svgTimerButton(svgName="", buttonId="") %}
-<button id="{{ buttonId }}" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color">
-  <svg class="fill-current inline-block w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS[svgName].dimension }}">
-    {{ ICONS[svgName].path|safe }}
-  </svg>
-</button>
+{{ svgBaseButton(svgName=svgName, svgClass="inline-block w-6 h-6", buttonId=buttonId) }}
+{% endmacro %}
+
+
+{% macro svgUserDataButton(svgName="", buttonId="") %}
+{{ svgBaseButton(svgName=svgName, svgClass="w-[1.1rem] h-[1.1rem]", buttonId=buttonId) }}
 {% endmacro %}
 
 
 <!-- added undeclared classNames for DOM traversal -->
 {% macro todolistItem(content="") %}
 <div class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 todolist-item">
-  <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color todolist-item-content">{{ content|e }}</div>
+  <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color todolist-item-content text-sm">{{ content|e }}</div>
   <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-300 todolist-item-edit-form">
-    <form method="post" class="select-none todolist-item-edit-form">
-      <input type="hidden" name="todolistItem_edit_prev" value="{{ content|e }}" autocomplete="off">
-      <input type="hidden" name="todolistItem_edit" class="todolist-item-edit-content" value="{{ content|e }}" autocomplete="off">
+    <form action="{{ url_for('api.edit_todolist_item') }}" method="post" class="select-none todolist-item-edit-form">
+      <input type="hidden" name="todolist-item-edit-prev" value="{{ content|e }}" autocomplete="off">
+      <input type="hidden" name="todolist-item-edit" class="todolist-item-edit-content" value="{{ content|e }}" autocomplete="off">
       <button type="button" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color todolist-item-edit-button">
         <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['pen-to-square_'].dimension }}">
           {{ ICONS['pen-to-square_'].path|safe }}
         </svg>
       </button>
     </form>
-    <form method="post" class="select-none">
-      <input type="hidden" name="todolistItem_del" value="{{ content|e }}" autocomplete="off">
+    <form action="{{ url_for('api.delete_todolist_item') }}" method="post" class="select-none">
+      <input type="hidden" name="todolist-item-delete" value="{{ content|e }}" autocomplete="off">
       <button type="submit" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color">
         <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['trash-can_'].dimension }}">
           {{ ICONS['trash-can_'].path|safe }}
@@ -77,7 +87,7 @@
 
 
 {% macro todolistBar(method="post", outerDivId="", inputId="", buttonId="", inputName="", buttonType="submit", svgName="") %}
-<form action="#" method="{{ method }}" class="flex-none h-fit w-full">
+<form action="{{ url_for('api.add_todolist_item' )}}" method="{{ method }}" class="flex-none h-fit w-full">
   <div id="{{ outerDivId }}" class="flex flex-row items-center py-2 px-4 bg-sub-alt-color transition-colors duration-300 rounded-lg">
     <input type="text" name="{{ inputName }}" id="{{ inputId }}" class="flex-grow w-20 rounded-lg caret-transparent text-text-color bg-transparent transition-colors duration-300 preventEnterKey" autocomplete="off">
     <button type="{{ buttonType }}" id="{{ buttonId }}" class="flex-none transition-colors duration-300 text-sub-color hover:text-text-color">

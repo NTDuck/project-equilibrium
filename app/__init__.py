@@ -24,7 +24,7 @@ def create_app(config_name):
         db, htmlmin, moment,
     ):
         ext.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True)
 
     from .main import main as main_bp
     app.register_blueprint(main_bp)

@@ -164,7 +164,12 @@ export class Timer {
 
     this.maxWidth = this.containerDiv.width();
     this.timerInterval = null;
-    this.audioFolder = "/static/audio/session_complete_notify";
+
+    this.audioApiRoute = "/api/audio-files";
+    this.audioFolder = "/static/audio";
+
+    this.imageApiRoute = "/api/timer-image-files";
+    this.imageFolder = "/static/images/gifs/timer";
 
     this.init();
   }
@@ -173,13 +178,31 @@ export class Timer {
     this.addEventListeners();
     this.prepareTimerConfig();
     this.prepareAudio();
+    this.prepareDisplayImages();
   }
 
+  // warning: should move fetch() outside event listeners
   addEventListeners() {
     this.playButton.click(this.toggleState.bind(this));
     this.pauseButton.click(this.toggleState.bind(this));
     this.skipButton.click(this.skip.bind(this));
     window.addEventListener("beforeunload", this.saveProgress.bind(this));
+    
+    // bind spacebar to play/pause buttons
+    $(document).keydown((event) => {
+      if (event.shiftKey && event.key === " ") {
+        event.preventDefault();
+        this.toggleState();
+      }
+    });
+
+    // bind Shift + N to skip button
+    $(document).keydown((event) => {
+      if (event.shiftKey && event.key === "N") {
+        event.preventDefault();
+        this.skip();
+      }
+    });
   }
 
   // warning: fetch request not fully resolved when called
@@ -214,23 +237,60 @@ export class Timer {
 
   // warning: fetch request not fully resolved when called
   prepareAudio() {
-    // complete the api endpoint
-    let apiRouteParam = this.audioFolder.split("/").pop();
-    fetch(`/api/audio-files/${apiRouteParam}`)
+    let audioSessionCompleteFolder = "timer-session-complete";
+    let audioStatusChangeFolder = "timer-status-change";
+    
+    // retrieve all files from designated folders
+    fetch(`${this.audioApiRoute}/${audioSessionCompleteFolder}`)
       .then(response => response.json())
       .then(audioFiles => {
-        // retrieve all files in designated folder
-        this.audio = audioFiles.map(fileUrl => new Audio(`${this.audioFolder}/${fileUrl}`));
-      })
-      .catch(error => {
-        console.error("Error retrieving audio files:", error);
+        this.audioSessionComplete = audioFiles.map(fileUrl => new Audio(`${this.audioFolder}/${audioSessionCompleteFolder}/${fileUrl}`));
+      });
+
+    fetch(`${this.audioApiRoute}/${audioStatusChangeFolder}`)
+      .then(response => response.json())
+      .then(audioFiles => {
+        this.audioStatusChange = audioFiles.map(fileUrl => new Audio(`${this.audioFolder}/${audioStatusChangeFolder}/${fileUrl}`));
       });
   }
 
-  playAudio() {
-    // play random audio file from list
-    let selectedAudio = Math.floor(Math.random() * this.audio.length);
-    this.audio[selectedAudio].play();
+  prepareDisplayImages() {
+    this.imagePausedFolder = "paused";
+    this.imagePlayingWorkFolder = "playing-work";
+    this.imagePlayingShortBreakFolder = "playing-short-break";
+    this.imagePlayingLongBreakFolder = "playing-long-break";
+    
+    fetch(`${this.imageApiRoute}/${this.imagePausedFolder}`)
+      .then(response => response.json())
+      .then(imageFiles => {
+        this.imagesPaused = imageFiles;
+      });
+    fetch(`${this.imageApiRoute}/${this.imagePlayingWorkFolder}`)
+      .then(response => response.json())
+      .then(imageFiles => {
+        this.imagesPlayingWork = imageFiles;
+      });
+    fetch(`${this.imageApiRoute}/${this.imagePlayingShortBreakFolder}`)
+      .then(response => response.json())
+      .then(imageFiles => {
+        this.imagesPlayingShortBreak = imageFiles;
+      });
+    fetch(`${this.imageApiRoute}/${this.imagePlayingLongBreakFolder}`)
+      .then(response => response.json())
+      .then(imageFiles => {
+        this.imagesPlayingLongBreak = imageFiles;
+      });
+  }
+
+  // play random audio from list
+  playAudio(audio) {
+    let selectedAudio = Math.floor(Math.random() * audio.length);
+    audio[selectedAudio].play();
+  }
+
+  getImage(images) {
+    let selectedImage = Math.floor(Math.random() * images.length);
+    return images[selectedImage];
   }
 
   loadSavedProgress() {
@@ -256,19 +316,21 @@ export class Timer {
   }
 
   changeGifSrc() {
-    const path = this.image.attr("src");
-    const dirName = path.slice(0, path.lastIndexOf("/") + 1);
+    // don't even ask where this crap comes from
     if (this.timerState === "paused") {
-      this.image.attr("src", `${dirName}ht.gif`);
+      this.image.attr("src", `${this.imageFolder}/${this.imagePausedFolder}/${this.getImage(this.imagesPaused)}`);
     } else {
       if (this.currentSession === "work") {
-        this.image.attr("src", `${dirName}bbg_zzz230407.gif`);
+        this.image.attr("src", `${this.imageFolder}/${this.imagePlayingWorkFolder}/${this.getImage(this.imagesPlayingWork)}`);
       } else if (this.currentSession === "shortBreak") {
-        this.image.attr("src", `${dirName}gb_genshin230328.gif`);
+        this.image.attr("src", `${this.imageFolder}/${this.imagePlayingShortBreakFolder}/${this.getImage(this.imagesPlayingShortBreak)}`);
       } else {
-        this.image.attr("src", `${dirName}di2.gif`);
+        this.image.attr("src", `${this.imageFolder}/${this.imagePlayingLongBreakFolder}/${this.getImage(this.imagesPlayingLongBreak)}`);
       }
     }
+    // subtle animation
+    this.image.hide();
+    this.image.fadeIn(300);
   }
 
   start() {
@@ -281,18 +343,15 @@ export class Timer {
         this.timerCount--;
       }
     }, this.timerCountSpeed);
-    this.changeGifSrc();
   }
 
   stop() {
     clearInterval(this.timerInterval);
-    this.changeGifSrc();
   }
 
   skip() {
     this.stop();
     this.sessionComplete();
-    this.changeGifSrc();
   }
 
   sessionComplete() {
@@ -312,9 +371,11 @@ export class Timer {
     }
     this.timerCountMax = this.timerCount;
     this.timerState = "paused";
+
     this.updateDisplay();
     this.changeGifSrc();
-    this.playAudio();
+    this.playAudio(this.audioStatusChange);
+    this.playAudio(this.audioSessionComplete);
   }
 
   updateDisplay() {
@@ -334,7 +395,7 @@ export class Timer {
     let [minutes, seconds] = formatTime(this.timerCount);
     this.numberDiv.text(`${minutes}:${seconds}`);
 
-    // update element colors
+    // update colors
     if (this.timerState === "paused") {
       this.numberDiv.fadeIn(300);
       this.progressDiv.removeClass("bg-text-color bg-main-color").addClass("bg-sub-color");
@@ -363,13 +424,15 @@ export class Timer {
       this.timerState = "paused";
       this.stop();
     }
+    this.changeGifSrc();
+    this.playAudio(this.audioStatusChange);
     this.updateDisplay();
   }
 }
 
 
 
-export function handleKeydownEvent(element, isCtrl, isShift, isAlt, key) {
+export function handleKeydownEvent(element, triggerEvent, isCtrl, isShift, isAlt, key) {
   $(document).keydown(function(event) {
     if (
       (!isCtrl || (event.ctrlKey || event.metaKey)) &&
@@ -378,7 +441,7 @@ export function handleKeydownEvent(element, isCtrl, isShift, isAlt, key) {
       event.key === key
     ) {
       event.preventDefault();
-      element.focus();
+      element.trigger(triggerEvent);
     }
   });
 }

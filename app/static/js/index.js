@@ -44,8 +44,8 @@ $(document).ready(function() {
   });
 
   // focus certain elements on certain keyboard events
-  handleKeydownEvent($("#todolist-input-input"), true, true, false, "P");
-  handleKeydownEvent($("#todolist-search-input"), false, true, true, "F");
+  handleKeydownEvent($("#todolist-input-input"), "focus", true, true, false, "P");
+  handleKeydownEvent($("#todolist-search-input"), "focus", false, true, true, "F");
 
   // control color transition of search bars
   const TodolistBarInput = new TodolistBarColorTransition($("#todolist-input-outerDiv"), $("#todolist-input-input"), $("#todolist-input-button"));
@@ -65,4 +65,14 @@ $(document).ready(function() {
 
   // control timer
   const timer = new Timer($("#timer-button-play"), $("#timer-button-pause"), $("#timer-button-skip"), $("#timer-display-number"), $("#timer-display-progress"), $("#timer-display-container"), $("#timer-display-gif"));
+
+  // handle user data upload
+  $("#user-data-upload-button").click(function() {
+    $("#user-data-upload-input").click();
+  });
+  $("#user-data-upload-form").on("change", function() {
+    if ($("#user-data-upload-input:file").length === 1) {
+      $("#user-data-upload-form").submit();
+    }
+  })
 });
