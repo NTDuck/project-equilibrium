@@ -1,4 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="max-w-7xl h-full mx-auto px-8 gap-2">
+  {% for sessionCount in sessionCounts %}
+  <div>
+    <h2>Date: {{ sessionCount['date'] }}</h2>
+    <span>Total sessions: {{ sessionCount['session_count'] }}</span>
+  </div>
+  {% endfor %}
+</div>
 {% endblock %}

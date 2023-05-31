@@ -171,6 +171,8 @@ export class Timer {
     this.imageApiRoute = "/api/timer-image-files";
     this.imageFolder = "/static/images/gifs/timer";
 
+    this.sessionCountApiRoute = "/api/update-timer-session-count";
+
     this.init();
   }
   
@@ -282,6 +284,19 @@ export class Timer {
       });
   }
 
+  updateSessionCount() {
+    fetch(`${this.sessionCountApiRoute}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ "session-count": 1 }),
+    })
+      .catch(error => {
+        console.error(error);
+      })
+  }
+
   // play random audio from list
   playAudio(audio) {
     let selectedAudio = Math.floor(Math.random() * audio.length);
@@ -368,9 +383,11 @@ export class Timer {
     } else if (this.currentSession !== "work") {
       this.currentSession = "work";
       this.timerCount = this.workSessionLength;
+      this.updateSessionCount();   // only update session count after breaks
     }
     this.timerCountMax = this.timerCount;
     this.timerState = "paused";
+
 
     this.updateDisplay();
     this.changeGifSrc();

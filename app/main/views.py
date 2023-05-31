@@ -2,15 +2,16 @@
 from flask import render_template, request
 from . import main
 from .. import db
-from ..utils import TodolistDbHandler
+from ..utils import TodolistDbHandler, TimerSessionCountDbHandler
 
 
-todolistItemEventHandler = TodolistDbHandler(request, db)
+todolistDbHandler = TodolistDbHandler(request, db)
+timerSessionCountDbHandler = TimerSessionCountDbHandler(request, db)
 
 
 @main.get("/")
 def index():
-    return render_template("index.html", todolistItems=todolistItemEventHandler.handle_db_read())
+    return render_template("index.html", todolistItems=todolistDbHandler.handle_db_read())
 
 
 @main.route("/about")
@@ -20,7 +21,7 @@ def about():
 
 @main.route("/stats")
 def stats():
-    return render_template("views/stats.html")
+    return render_template("views/stats.html", sessionCounts=timerSessionCountDbHandler.handle_db_read())
 
 
 @main.route("/settings")
