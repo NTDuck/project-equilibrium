@@ -41,3 +41,9 @@ def update_timer_session_count():
             timerSessionCountDbHandler.handle_db_insert()
         print(DailySessionCount.session_count)
     return redirect(url_for("main.index"))   # server returns 500 otherwise
+
+
+@api.get("/get-timer-session-count")
+def get_timer_session_count():
+    timer_session_counts = timerSessionCountDbHandler.handle_db_read()   # list[date_string, int]
+    return jsonify(timer_session_counts)

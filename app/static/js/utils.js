@@ -448,7 +448,6 @@ export class Timer {
 }
 
 
-
 export function handleKeydownEvent(element, triggerEvent, isCtrl, isShift, isAlt, key) {
   $(document).keydown(function(event) {
     if (

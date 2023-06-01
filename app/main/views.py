@@ -2,7 +2,7 @@
 from flask import render_template, request
 from . import main
 from .. import db
-from ..utils import TodolistDbHandler, TimerSessionCountDbHandler
+from ..utils import TodolistDbHandler, TimerSessionCountDbHandler, handle_timer_data
 
 
 todolistDbHandler = TodolistDbHandler(request, db)
@@ -21,7 +21,9 @@ def about():
 
 @main.route("/stats")
 def stats():
-    return render_template("views/stats.html", sessionCounts=timerSessionCountDbHandler.handle_db_read())
+    raw_timer_data = timerSessionCountDbHandler.handle_db_read()
+    timer_data, max_session_count = handle_timer_data(raw_timer_data)
+    return render_template("views/stats.html", timer_data=timer_data, max_session_count=max_session_count)
 
 
 @main.route("/settings")

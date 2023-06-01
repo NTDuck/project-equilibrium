@@ -164,3 +164,10 @@ def validate_json_data(file) -> dict | bool:
         return False
     
     return json_data
+
+
+def handle_timer_data(data: list[TimerSessionCount]):
+    item_session_counts = [item.session_count for item in data]
+    timer_data = [[item.date.strftime("%b"), item.date.strftime("%d"), item.session_count] for item in data]
+
+    return timer_data, max(item_session_counts)
