@@ -13,7 +13,7 @@ from ..models import TimerSessionCount
 timerSessionCountDbHandler = TimerSessionCountDbHandler(request, db)
 
 
-@api.get("/timer-config")
+@api.get("/timer/config")
 def get_timer_config():
     timer_configs = {
         "work": Config.TIMER_WORK_SESSION_LENGTH,
@@ -25,13 +25,13 @@ def get_timer_config():
     return jsonify(timer_configs)
 
 
-@api.get("/timer-image-files/<folder>")
+@api.get("/timer/image-files/<folder>")
 def get_timer_gifs(folder):
     timer_display_image_files = os.listdir(os.path.join(os.path.dirname(__file__), f"../static/images/gifs/timer/{folder}/"))
     return jsonify(timer_display_image_files)
 
 
-@api.post("/update-timer-session-count")
+@api.post("/timer/session-count/update")
 def update_timer_session_count():
     if "session-count" in request.json:
         DailySessionCount = TimerSessionCount.query.filter_by(date=date.today()).first()
@@ -39,11 +39,10 @@ def update_timer_session_count():
             timerSessionCountDbHandler.handle_db_update(DailySessionCount)
         else:   # non-existent query
             timerSessionCountDbHandler.handle_db_insert()
-        print(DailySessionCount.session_count)
     return redirect(url_for("main.index"))   # server returns 500 otherwise
 
 
-@api.get("/get-timer-session-count")
+@api.get("/timer/session-count/get")
 def get_timer_session_count():
     timer_session_counts = timerSessionCountDbHandler.handle_db_read()   # list[date_string, int]
     return jsonify(timer_session_counts)

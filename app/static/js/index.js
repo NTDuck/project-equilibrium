@@ -6,19 +6,19 @@ import { TodolistBarColorTransition, TodolistItemColorTransition, Timer, handleK
 $(document).ready(function() {
   // search query
   $("#todolist-search-button").click(function() {
-    $(".todolist-item").fadeOut(300);
+    $(".utils-item").fadeOut(300);
     const todolistItemSearchQuery = $("#todolist-search-input").val().toLowerCase().trim();
     if (todolistItemSearchQuery !== '') {
-      $(".todolist-item-content").each(function() {
+      $(".utils-item-content").each(function() {
         if ($(this).text().toLowerCase().includes(todolistItemSearchQuery)) {
-          $(this).closest('.todolist-item').fadeIn(300);
+          $(this).closest('.utils-item').fadeIn(300);
         }
       });
     }
   });
 
-  // copy item's content to clipboard when clicked
-  $(".todolist-item-content").each(function() {
+  // copy content of certain class to clipboard when clicked
+  $(".item-copy-content").each(function() {
     $(this).click(function() {
       navigator.clipboard
         .writeText($(this).text())
@@ -27,11 +27,17 @@ $(document).ready(function() {
         })
     });
   });
-
-  // retain scroll progress of todolist between refreshes
+  
+  // retain scroll progress of chatbot between refreshes
   $("#todolist-list").scrollTop(localStorage.getItem("todolistScrollPosition"));
   $("#todolist-list").scroll(function() {
     localStorage.setItem("todolistScrollPosition", $(this).scrollTop());
+  });
+  
+  // retain scroll progress of todolist between refreshes
+  $("#chatbot-message-container").scrollTop(localStorage.getItem("chatbotScrollPosition"));
+  $("#chatbot-message-container").scroll(function() {
+    localStorage.setItem("chatbotScrollPosition", $(this).scrollTop());
   });
 
   // prevent default enter key behavior in specified elements (todolist bars)
@@ -50,15 +56,16 @@ $(document).ready(function() {
   // control color transition of search bars
   const TodolistBarInput = new TodolistBarColorTransition($("#todolist-input-outerDiv"), $("#todolist-input-input"), $("#todolist-input-button"));
   const TodolistBarSearch = new TodolistBarColorTransition($("#todolist-search-outerDiv"), $("#todolist-search-input"), $("#todolist-search-button"));
+  const ChatbotBarInput = new TodolistBarColorTransition($("#chatbot-input-outerDiv"), $("#chatbot-input-input"), $("#chatbot-input-button"));
   
   // control color transition of items on "edit" toggle
   // warning: not yet implemented into jquery, will do in future versions
-  const todolistItems = document.querySelectorAll('.todolist-item');
+  const todolistItems = document.querySelectorAll('.utils-item');
 
   todolistItems.forEach(todolistItem => {
-    const todolistItemContent = todolistItem.querySelector('.todolist-item-content');
-    const todolistItemEditForm = todolistItem.querySelector('.todolist-item-edit-form');
-    const todolistItemEditButton = todolistItem.querySelector('.todolist-item-edit-button');
+    const todolistItemContent = todolistItem.querySelector('.utils-item-content');
+    const todolistItemEditForm = todolistItem.querySelector('.utils-item-edit-form');
+    const todolistItemEditButton = todolistItem.querySelector('.utils-item-edit-button');
   
     const TodolistItemTransition = new TodolistItemColorTransition(todolistItem, todolistItemContent, todolistItemEditForm, todolistItemEditButton);
   });
@@ -74,5 +81,5 @@ $(document).ready(function() {
     if ($("#user-data-upload-input:file").length === 1) {
       $("#user-data-upload-form").submit();
     }
-  })
+  });
 });

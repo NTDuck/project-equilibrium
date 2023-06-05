@@ -4,11 +4,11 @@
 a minimal workspace.
 ## Features
 
-- A funny-looking mascot that chills when you suffer (pending)
-- A simple todolist that you'll probably find useless (pending)
-- A music player that prevents you from concentrating on your work (pending)
-- An AI-powered chatbot that pales into insignificance beside ChatGPT (pending)
-- A beautiful and comfortable [dark color scheme](https://github.com/monkeytypegame/monkeytype/blob/16c956c62c241deb9c3ffd0f3b3647625df4156e/frontend/static/themes/serika_dark.css) to reduce eye strain and help you focus.
+- neco-arc (why not)
+- a simple todolist (finished)
+- a pomodoro timer (inaccurate, will be customizable)
+- an AI-powered chatbot that generates random messages (in development)
+- a beautiful and comfortable [dark color scheme](https://github.com/monkeytypegame/monkeytype/blob/16c956c62c241deb9c3ffd0f3b3647625df4156e/frontend/static/themes/serika_dark.css) to reduce eye strain and help you focus.
 ## Dependencies
 
 - [Python](https://www.python.org/downloads/) 3.11.3 or above.
@@ -46,7 +46,9 @@ $ source venv/bin/activate
 ```
 Alternatively, for ensured version conflict/incompatibility:
 ```
-(venv) $ pip install flask flask-moment flask-sqlalchemy flask-migrate Flask-HTMLmin flask-socketio python-dotenv
+(venv) $ pip install flask flask-moment flask-sqlalchemy flask-migrate Flask-HTMLmin python-dotenv
+(venv) $ pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+(venv) % pip install transformers
 ```
 
 ## Deployment
@@ -74,7 +76,7 @@ Press CTRL+C to quit
 
 ## Acknowledgements
 
-- Gifs from [Seseren](https://www.pixiv.net/en/users/16274829).
+- Gifs from [Seseren](https://www.pixiv.net/en/users/16274829), [u/BeardyDuck](https://www.reddit.com/user/BeardyDuck/) from [r/meltyblood](https://www.reddit.com/r/meltyblood/comments/wtpt66/neco_arc_pngs_are_available_so_i_made_some_select/).
 - Audio by Herta from Honkai: Star Rail.
 
 

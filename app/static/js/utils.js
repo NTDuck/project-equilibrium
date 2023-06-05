@@ -65,7 +65,7 @@ export class TodolistItemColorTransition {
     if (isEditable) {
       this.contentDiv.setAttribute('contenteditable', 'false');
       // change the value of a hidden input field
-      const inputContent = this.button.closest('.todolist-item-edit-form').querySelector('.todolist-item-edit-content');
+      const inputContent = this.button.closest('.utils-item-edit-form').querySelector('.utils-item-edit-content');
       inputContent.value = this.contentDiv.innerText;
       this.button.setAttribute('type', 'submit');
     } else {
@@ -168,10 +168,10 @@ export class Timer {
     this.audioApiRoute = "/api/audio-files";
     this.audioFolder = "/static/audio";
 
-    this.imageApiRoute = "/api/timer-image-files";
+    this.imageApiRoute = "/api/timer/image-files";
     this.imageFolder = "/static/images/gifs/timer";
 
-    this.sessionCountApiRoute = "/api/update-timer-session-count";
+    this.sessionCountApiRoute = "/api/timer/session-count/update";
 
     this.init();
   }
@@ -192,7 +192,7 @@ export class Timer {
     
     // bind spacebar to play/pause buttons
     $(document).keydown((event) => {
-      if (event.shiftKey && event.key === " ") {
+      if ((event.ctrlKey || event.metaKey) && event.key === " ") {
         event.preventDefault();
         this.toggleState();
       }
@@ -200,7 +200,7 @@ export class Timer {
 
     // bind Shift + N to skip button
     $(document).keydown((event) => {
-      if (event.shiftKey && event.key === "N") {
+      if ((event.ctrlKey || event.metaKey) && event.key === "N") {
         event.preventDefault();
         this.skip();
       }
@@ -209,7 +209,7 @@ export class Timer {
 
   // warning: fetch request not fully resolved when called
   prepareTimerConfig() {
-    fetch("/api/timer-config")
+    fetch("/api/timer/config")
       .then(response => response.json())
       .then(timerConfigs => {
         this.workSessionLength = timerConfigs["work"] * 60;
@@ -290,7 +290,9 @@ export class Timer {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ "session-count": 1 }),
+      body: JSON.stringify({
+        "session-count": 1,
+      }),
     })
       .catch(error => {
         console.error(error);
@@ -405,8 +407,8 @@ export class Timer {
     }
 
     // update progressDiv width
-    var currentWidth = ((this.timerCountMax - this.timerCount) / this.timerCountMax) * this.maxWidth;
-    this.progressDiv.width(currentWidth);
+    var currentWidthPercentage = ((this.timerCountMax - this.timerCount) / this.timerCountMax) * 100;
+    this.progressDiv.css("width", currentWidthPercentage + "%");    
 
     // update numberDiv time
     let [minutes, seconds] = formatTime(this.timerCount);
