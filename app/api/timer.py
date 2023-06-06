@@ -34,15 +34,16 @@ def get_timer_gifs(folder):
 @api.post("/timer/session-count/update")
 def update_timer_session_count():
     if "session-count" in request.json:
-        DailySessionCount = TimerSessionCount.query.filter_by(date=date.today()).first()
-        if DailySessionCount is not None:   # query already exists
-            timerSessionCountDbHandler.handle_db_update(DailySessionCount)
+        item = TimerSessionCount.query.filter_by(date=date.today()).first()
+        if item is not None:   # query already exists
+            timerSessionCountDbHandler.edit(item)
         else:   # non-existent query
-            timerSessionCountDbHandler.handle_db_insert()
+            timerSessionCountDbHandler.create(date=date.today(), session_count=1)
+        timerSessionCountDbHandler.commit_session()
     return redirect(url_for("main.index"))   # server returns 500 otherwise
 
 
 @api.get("/timer/session-count/get")
 def get_timer_session_count():
-    timer_session_counts = timerSessionCountDbHandler.handle_db_read()   # list[date_string, int]
+    timer_session_counts = timerSessionCountDbHandler.read()   # list[list[str, int]]
     return jsonify(timer_session_counts)

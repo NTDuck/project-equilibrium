@@ -16,13 +16,13 @@ chatbotMessageDbHandler = ChatbotMessageDbHandler(request, db)
 @api.get("/user-data/download")
 def download_user_data():
     # retrieve user data
-    todolistItems = todolistDbHandler.handle_db_read()
+    todolistItems = todolistDbHandler.read()
     todolistData = [todolistItem.value for todolistItem in todolistItems]
 
-    timerSessionCounts = timerSessionCountDbHandler.handle_db_read()
+    timerSessionCounts = timerSessionCountDbHandler.read()
     timerSessionCountData = [[timerSessionCount.date.isoformat(), timerSessionCount.session_count] for timerSessionCount in timerSessionCounts]
 
-    chatbotMessages = chatbotMessageDbHandler.handle_db_read()
+    chatbotMessages = chatbotMessageDbHandler.read()
     chatbotMessagesData = [[chatbotMessage.value, chatbotMessage.type] for chatbotMessage in chatbotMessages]
 
     json_data = json.dumps({
@@ -45,7 +45,7 @@ def download_user_data():
 @api.get("/user-data/delete")
 def delete_user_data():
     for dbHandler in [todolistDbHandler, timerSessionCountDbHandler, chatbotMessageDbHandler]:
-        dbHandler.delete_table()
+        dbHandler.delete_all()
     # note-to-self: send fetch request to frontend to clear localStorage
     return redirect(url_for("main.index"))
 
@@ -64,16 +64,17 @@ def upload_user_data():
         abort(400)
 
     # handle json data upon validation
-    todolistItems = json_data.get("todolist")
-    todolistDbHandler.handle_db_multiple_insert(todolistItems)
+    rawTodolistItems = json_data.get("todolist")   # list[str]
+    todolistItems = [{"value": value} for value in rawTodolistItems]   # list[dict[str, str]]
+    todolistDbHandler.create_all(todolistItems)
 
-    rawTimerSessionCounts = json_data.get("timer-session-count")
-    timerSessionCounts = [[date.fromisoformat(date_string), session_count] for [date_string, session_count] in rawTimerSessionCounts]
-    timerSessionCountDbHandler.handle_db_multiple_insert(timerSessionCounts)
+    rawTimerSessionCounts = json_data.get("timer-session-count")   # list[list[str, str]]
+    timerSessionCounts = [{"date": date.fromisoformat(date_string), "session_count": session_count} for [date_string, session_count] in rawTimerSessionCounts]   # list[dict[str, str]]
+    timerSessionCountDbHandler.create_all(timerSessionCounts)
 
-    rawChatbotMessages = json_data.get("chatbot-messages")
-    chatbotMessages = [item for item in rawChatbotMessages]
-    chatbotMessageDbHandler.handle_db_multiple_insert(chatbotMessages)
+    rawChatbotMessages = json_data.get("chatbot-messages")   # list[list[str, str]]
+    chatbotMessages = [{"value": value, "type": type} for [value, type] in rawChatbotMessages]   # list[dict[str, str]]
+    chatbotMessageDbHandler.create_all(chatbotMessages)
     
     return redirect(url_for("main.index"))
 

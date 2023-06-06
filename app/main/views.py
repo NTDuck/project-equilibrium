@@ -10,9 +10,9 @@ timerSessionCountDbHandler = TimerSessionCountDbHandler(request, db)
 chatbotMessageDbHandler = ChatbotMessageDbHandler(request, db)
 
 
-@main.get("/")
+@main.route("/")
 def index():
-    return render_template("index.html", todolistItems=todolistDbHandler.handle_db_read(), chatbotMessages=chatbotMessageDbHandler.handle_db_read())
+    return render_template("index.html", todolistItems=todolistDbHandler.read(), chatbotMessages=chatbotMessageDbHandler.read())
 
 
 @main.route("/about")
@@ -20,9 +20,9 @@ def about():
     return render_template("views/about.html")
 
 
-@main.get("/stats")
+@main.route("/stats")
 def stats():
-    raw_timer_data = timerSessionCountDbHandler.handle_db_read()
+    raw_timer_data = timerSessionCountDbHandler.read()
     timer_data, max_session_count = handle_timer_data(raw_timer_data)
     return render_template("views/stats.html", timer_data=timer_data, max_session_count=max_session_count)
 
