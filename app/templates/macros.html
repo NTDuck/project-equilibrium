@@ -61,21 +61,20 @@
 {% endmacro %}
 
 
-{% macro utilsItem(apiRouteEdit, apiRouteDelete, inputNameEdit, inputNameDelete, content="") %}
+{% macro utilsItem(apiRouteEdit, apiRouteDelete, inputNameEdit, inputNameDelete, formClassEdit, formClassDelete, content="") %}
 <div class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 utils-item">
   <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color text-sm utils-item-content item-copy-content">{{ content|e }}</div>
-  <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-300">
-    <form action="{{ url_for(apiRouteEdit) }}" method="post" class="select-none utils-item-edit-form">
-      <input type="hidden" name="{{ inputNameEdit }}-prev" value="{{ content|e }}" autocomplete="off">
-      <input type="hidden" name="{{ inputNameEdit }}" class="utils-item-edit-content" value="{{ content|e }}" autocomplete="off">
+  <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-500">
+    <form action="{{ url_for(apiRouteEdit) }}" method="post" class="select-none utils-item-edit-form {{ formClassEdit }}">
+      <input class="utils-item-edit-input" type="hidden" name="{{ inputNameEdit }}" value="{{ content|e }}" autocomplete="off">
       <button type="button" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color utils-item-edit-button">
         <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['pen-to-square_'].dimension }}">
           {{ ICONS['pen-to-square_'].path|safe }}
         </svg>
       </button>
     </form>
-    <form action="{{ url_for(apiRouteDelete) }}" method="post" class="select-none">
-      <input type="hidden" name="{{ inputNameDelete }}" value="{{ content|e }}" autocomplete="off">
+    <form action="{{ url_for(apiRouteDelete) }}" method="post" class="select-none {{ formClassDelete }}">
+      <input class="utils-item-delete-input" type="hidden" name="{{ inputNameDelete }}" value="{{ content|e }}" autocomplete="off">
       <button type="submit" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color">
         <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['trash-can_'].dimension }}">
           {{ ICONS['trash-can_'].path|safe }}
@@ -90,7 +89,7 @@
 {% macro chatbotServerMsg(apiRouteReload, inputNameReload, content="") %}
 <div class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 utils-item">
   <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color text-sm utils-item-content item-copy-content">{{ content|e }}</div>
-  <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-300">
+  <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-500">
     <form action="{{ url_for(apiRouteReload) }}" method="post" class="select-none utils-item-edit-form">
       <input type="hidden" name="{{ inputNameReload }}" value="{{ content|e }}" autocomplete="off">
       <button class="utils-item-edit-button"></button>

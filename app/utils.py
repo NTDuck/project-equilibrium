@@ -13,7 +13,7 @@ class BaseDbHandler:
         self.db = db
         self.modelClass = modelClass
 
-    def validate(self, value: str, min_str_length=0, max_str_length=128) -> bool:
+    def validate(self, value: str, min_str_length=Config.USER_INPUT_MIN_STRING_LENGTH, max_str_length=Config.USER_INPUT_MAX_STRING_LENGTH) -> bool:
         return all([
             min_str_length < len(value) < max_str_length,
             not value.isspace(),
@@ -169,7 +169,7 @@ def validate_json_data(file) -> dict | bool:
         # check if types follows pattern ["user", "server"]
         all([
             list(set(types)) != ["user", "server"],
-            types == [],
+            not types,   # types == []
         ]),
         types != ["user", "server"] * (len(types) // 2)
     ]):

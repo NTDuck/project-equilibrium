@@ -4,11 +4,11 @@
 {% block content %}
 <div class="grid grid-cols-4 max-w-7xl h-full mx-auto px-8 gap-2 text-sub-color">
   <div class="col-span-1 flex flex-col items-center justify-center text-start gap-2">
-    {{ utilsBar(apiRoute="api.add_todolist_item", outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolist-item-add", svgName="circle-plus") }}
+    {{ utilsBar(apiRoute="api.add_todolist_item", formId="todolist-input-form", outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolist-item-add", svgName="circle-plus") }}
     {{ utilsBar(outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="button", svgName="magnifying-glass") }}
-    <div id="todolist-list" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y">
+    <div id="todolist-list" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y rounded-lg">
       {% for item in todolistItems %}
-      {{ utilsItem(content=item.value, apiRouteEdit="api.edit_todolist_item", apiRouteDelete="api.delete_todolist_item", inputNameEdit="todolist-item-edit", inputNameDelete="todolist-item-delete") }}
+      {{ utilsItem(content=item.value, apiRouteEdit="api.edit_todolist_item", apiRouteDelete="api.delete_todolist_item", inputNameEdit="todolist-item-edit", inputNameDelete="todolist-item-delete", formClassEdit="todolist-item-edit-form", formClassDelete="todolist-item-delete-form") }}
       {% endfor %}
     </div>
     <div class="flex flex-col flex-none items-center justify-center w-full h-20 rounded-lg bg-sub-alt-color text-main-color">
@@ -39,7 +39,7 @@
   </div>
   
   <div class="flex flex-col col-span-1 gap-2">
-    <div id="chatbot-message-container" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y">
+    <div id="chatbot-message-container" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y rounded-lg">
       {% for item in chatbotMessages %}
       {% if item.type == "user" %}
       {{ utilsItem(content=item.value, apiRouteEdit="api.edit_user_message", apiRouteDelete="api.delete_user_message", inputNameEdit="chatbot-msg-edit", inputNameDelete="chatbot-msg-delete") }}

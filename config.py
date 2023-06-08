@@ -9,6 +9,9 @@ class Config:
     TIMER_DELAY = 1000   # inevitable inaccuracy
     # timer delay affected by browser
 
+    USER_INPUT_MIN_STRING_LENGTH = 0
+    USER_INPUT_MAX_STRING_LENGTH = 128
+
     USER_DATA_ALLOWED_FILE_EXTENSIONS = {".json"}
 
     HUGGINGFACE_MODEL = "distilgpt2"
