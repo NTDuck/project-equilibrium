@@ -47,6 +47,7 @@ def delete_user_data():
     for dbHandler in [todolistDbHandler, timerSessionCountDbHandler, chatbotMessageDbHandler]:
         dbHandler.delete_all()
     # note-to-self: send fetch request to frontend to clear localStorage
+    todolistDbHandler.commit_session()   # could be any dbHandler
     return redirect(url_for("main.index"))
 
 
@@ -75,7 +76,8 @@ def upload_user_data():
     rawChatbotMessages = json_data.get("chatbot-messages")   # list[list[str, str]]
     chatbotMessages = [{"value": value, "type": type} for [value, type] in rawChatbotMessages]   # list[dict[str, str]]
     chatbotMessageDbHandler.create_all(chatbotMessages)
-    
+
+    todolistDbHandler.commit_session()   # could be any dbHandler
     return redirect(url_for("main.index"))
 
 

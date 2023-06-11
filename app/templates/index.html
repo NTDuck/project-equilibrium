@@ -4,11 +4,11 @@
 {% block content %}
 <div class="grid grid-cols-4 max-w-7xl h-full mx-auto px-8 gap-2 text-sub-color">
   <div class="col-span-1 flex flex-col items-center justify-center text-start gap-2">
-    {{ utilsBar(apiRoute="api.add_todolist_item", formId="todolist-input-form", outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolist-item-add", svgName="circle-plus") }}
-    {{ utilsBar(outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="button", svgName="magnifying-glass") }}
+    {{ utilsBar(formId="todolist-input-form", outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolist-item-add", svgName="circle-plus") }}
+    {{ utilsBar(formId="todolist-search-form", outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="submit", svgName="magnifying-glass") }}
     <div id="todolist-list" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y rounded-lg">
       {% for item in todolistItems %}
-      {{ utilsItem(content=item.value, apiRouteEdit="api.edit_todolist_item", apiRouteDelete="api.delete_todolist_item", inputNameEdit="todolist-item-edit", inputNameDelete="todolist-item-delete", formClassEdit="todolist-item-edit-form", formClassDelete="todolist-item-delete-form") }}
+      {{ utilsItem(content=item.value, formClassEdit="todolist-item-edit-form", formClassDelete="todolist-item-delete-form") }}
       {% endfor %}
     </div>
     <div class="flex flex-col flex-none items-center justify-center w-full h-20 rounded-lg bg-sub-alt-color text-main-color">
@@ -42,13 +42,13 @@
     <div id="chatbot-message-container" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y rounded-lg">
       {% for item in chatbotMessages %}
       {% if item.type == "user" %}
-      {{ utilsItem(content=item.value, apiRouteEdit="api.edit_user_message", apiRouteDelete="api.delete_user_message", inputNameEdit="chatbot-msg-edit", inputNameDelete="chatbot-msg-delete") }}
+      {{ utilsItem(content=item.value, formClassEdit="chatbot-user-msg-edit-form", formClassDelete="chatbot-user-msg-delete-form") }}
       {% else %}
-      {{ chatbotServerMsg(content=item.value, apiRouteReload="api.update_server_message", inputNameReload="chatbot-server-msg-edit") }}
+      {{ chatbotServerMsg(content=item.value, formClassEdit="chatbot-server-msg-edit-form") }}
       {% endif %}
       {% endfor %}
     </div>
-    {{ utilsBar(apiRoute="api.generate_server_message", formId="chatbot-input-form", outerDivId="chatbot-input-outerDiv", inputId="chatbot-input-input", buttonId="chatbot-input-button", inputName="chatbot-user-msg-input", svgName="circle-right") }}
+    {{ utilsBar(formId="chatbot-input-form", outerDivId="chatbot-input-outerDiv", inputId="chatbot-input-input", buttonId="chatbot-input-button", inputName="chatbot-user-msg-input", svgName="circle-right") }}
   </div>
 </div>
 {% endblock %}

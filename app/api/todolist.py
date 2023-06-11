@@ -19,7 +19,7 @@ def add_todolist_item():
                 todolistDbHandler.commit_session()
                 return jsonify(value)
             else:
-                abort(400)
+                return abort(400)
     return redirect(url_for("main.index"))
 
 

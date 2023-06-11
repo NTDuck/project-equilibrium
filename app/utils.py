@@ -2,7 +2,9 @@
 import os
 import json
 from datetime import date
+
 from transformers import pipeline
+
 from config import Config
 from .models import Todolist, TimerSessionCount, ChatbotMessage
 
@@ -32,7 +34,6 @@ class BaseDbHandler:
             for attrs in insert_array:
                 item = self.modelClass(**attrs)
                 self.db.session.add(item)
-            self.commit_session()
 
     def read(self) -> list:
         return self.modelClass.query.all()
@@ -43,7 +44,6 @@ class BaseDbHandler:
     
     def delete_all(self):
         self.modelClass.query.delete()
-        self.commit_session()
 
 
 class TodolistDbHandler(BaseDbHandler):
@@ -67,34 +67,21 @@ class ChatbotMessageDbHandler(BaseDbHandler):
     def __init__(self, request, db):
         super().__init__(request, db, ChatbotMessage)
 
-    def edit_user_msg(self, prev_value, new_value):
-        # edit value of specified message
-        item = self.modelClass.query.filter_by(value=prev_value).first()
-        setattr(item, "value", new_value)
-
-        # delete all messages after
-        self.modelClass.query.filter(self.modelClass.id > item.id).delete()
-
-        # generate new server message
-        server_message = text_generation(new_value)
-        self.create(value=server_message, type="server")
-
-    def delete(self, value):
+    def delete(self, value, ignore_items_from_self=0):
         # select last msg with specified content & delete all message after
         item = self.modelClass.query.filter_by(value=value).first()
         # warning: identical values get deleted altogether
-        self.modelClass.query.filter(self.modelClass.id >= item.id).delete()
+        self.modelClass.query.filter(self.modelClass.id >= item.id + ignore_items_from_self).delete()
 
-    def edit_server_msg(self, value):
+    def edit_server_msg(self, value) -> str:
         item = self.modelClass.query.filter_by(value=value).first()
         self.modelClass.query.filter(self.modelClass.id >= item.id).delete()
 
         # generate new server message based on content of last user msg
-        last_user_msg_id = item.id - 1
+        last_user_msg_id = getattr(item, "id") - 1
         last_user_msg_value = getattr(self.modelClass.query.filter_by(id=last_user_msg_id).first(), "value")
 
-        server_message = text_generation(last_user_msg_value)
-        self.create(value=server_message, type="server")
+        return last_user_msg_value
 
 
 def is_file_allowed(filename, allowed_file_exts) -> bool:

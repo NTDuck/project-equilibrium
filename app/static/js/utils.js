@@ -462,22 +462,22 @@ export function handleKeydownEvent(element, triggerEvent, isCtrl, isShift, isAlt
 }
 
 
-export function createUtilsItem(content, apiRouteEdit, apiRouteDelete, inputNameEdit, inputNameDelete, formClassEdit, formClassDelete) {
-  // should be identical to macros.html
-  var utilsItem = `
+export function createUtilsItem(content, formClassEdit, formClassDelete) {
+  // should be identical to utilsItem in macros.html
+  var htmlString = `
     <div class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 utils-item">
-      <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color text-sm utils-item-content item-copy-content">${content}</div>
+      <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color text-sm utils-item-content">${content}</div>
       <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-500">
-        <form action="${apiRouteEdit}" method="post" class="select-none utils-item-edit-form ${formClassEdit}">
-          <input class="utils-item-edit-input" type="hidden" name="${inputNameEdit}" value="${content}" autocomplete="off">
+        <form method="post" class="select-none utils-item-edit-form ${formClassEdit}">
+          <input class="utils-item-edit-input" type="hidden" value="${content}" autocomplete="off">
           <button type="button" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color utils-item-edit-button">
             <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
               <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152V424c0 48.6 39.4 88 88 88H360c48.6 0 88-39.4 88-88V312c0-13.3-10.7-24-24-24s-24 10.7-24 24V424c0 22.1-17.9 40-40 40H88c-22.1 0-40-17.9-40-40V152c0-22.1 17.9-40 40-40H200c13.3 0 24-10.7 24-24s-10.7-24-24-24H88z"/>
             </svg>
           </button>
         </form>
-        <form action="${apiRouteDelete}" method="post" class="select-none ${formClassDelete}">
-          <input class="utils-item-delete-input" type="hidden" name="${inputNameDelete}" value="${content}" autocomplete="off">
+        <form method="post" class="select-none ${formClassDelete}">
+          <input class="utils-item-delete-input" type="hidden" value="${content}" autocomplete="off">
           <button type="submit" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color">
             <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
               <path d="M170.5 51.6L151.5 80h145l-19-28.4c-1.5-2.2-4-3.6-6.7-3.6H177.1c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80H368h48 8c13.3 0 24 10.7 24 24s-10.7 24-24 24h-8V432c0 44.2-35.8 80-80 80H112c-44.2 0-80-35.8-80-80V128H24c-13.3 0-24-10.7-24-24S10.7 80 24 80h8H80 93.8l36.7-55.1C140.9 9.4 158.4 0 177.1 0h93.7c18.7 0 36.2 9.4 46.6 24.9zM80 128V432c0 17.7 14.3 32 32 32H336c17.7 0 32-14.3 32-32V128H80zm80 64V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0V400c0 8.8-7.2 16-16 16s-16-7.2-16-16V192c0-8.8 7.2-16 16-16s16 7.2 16 16z"/>
@@ -487,13 +487,36 @@ export function createUtilsItem(content, apiRouteEdit, apiRouteDelete, inputName
       </div>
     </div>
   `;
-  return utilsItem;
+  return htmlString;
 }
 
-// warning: as of this version, $("input.utils-item-edit-input-prev") will be removed, since $("input.utils-item-delete-input") performs similarly.
+
+export function createChatbotServerMessage(content, formClassEdit) {
+  // should be identical to chatbotServerMsg in macros.html
+  var htmlString = `
+    <div class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 utils-item no-custom-transition">
+    <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color text-sm utils-item-content">${content}</div>
+    <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-500">
+      <form method="post" class="select-none utils-item-edit-form ${formClassEdit}">
+        <button type="submit" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color utils-item-edit-button">
+          <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path d="M142.9 142.9c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8H463.5c0 0 0 0 0 0H472c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1C73.2 122 55.6 150.7 44.8 181.4c-5.9 16.7 2.9 34.9 19.5 40.8s34.9-2.9 40.8-19.5c7.7-21.8 20.2-42.3 37.8-59.8zM16 312v7.6 .7V440c0 9.7 5.8 18.5 14.8 22.2s19.3 1.7 26.2-5.2l41.6-41.6c87.6 86.5 228.7 86.2 315.8-1c24.4-24.4 42.1-53.1 52.9-83.7c5.9-16.7-2.9-34.9-19.5-40.8s-34.9 2.9-40.8 19.5c-7.7 21.8-20.2 42.3-37.8 59.8c-62.2 62.2-162.7 62.5-225.3 1L185 329c6.9-6.9 8.9-17.2 5.2-26.2s-12.5-14.8-22.2-14.8H48.4h-.7H40c-13.3 0-24 10.7-24 24z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+  `;
+  return htmlString;
+}
+
+
 export function handleUtilsItemUpdate(element, apiRoute) {
   element.submit(function(event) {
     event.preventDefault();
+    if ($(this).find(".utils-item-edit-input").val() === $(this).closest(".utils-item").find(".utils-item-content").text()) {
+      return;   // does nothing if nothing changed
+    }
     $(this).find(".utils-item-edit-input").val($(this).closest(".utils-item").find(".utils-item-content").text());   // before curreent fetch(): current new_value -> edited content from content div
     fetch(apiRoute, {
       method: "POST",
@@ -512,7 +535,7 @@ export function handleUtilsItemUpdate(element, apiRoute) {
       .catch(error => {
         console.error(error);
       })
-  })
+  });
 }
 
 
@@ -528,13 +551,111 @@ export function handleUtilsItemDeletion(element, apiRoute) {
         "todolist-item-delete": element.find("input.utils-item-delete-input").val(),
       }),
     })
+      .then($(this).closest(".utils-item").remove())
+      .catch(error => {
+        console.error(error);
+      });
+  });
+}
+
+
+export function handleChatbotUserMessageUpdate(element, apiRoute) {
+  element.submit(function(event) {
+    event.preventDefault();
+    var userMessageElem = $(this).closest(".utils-item");
+    var serverMessageElem = userMessageElem.next(".utils-item");
+    if ($(this).find(".utils-item-edit-input").val() === userMessageElem.find(".utils-item-content").text()) {
+      return;   // does nothing if nothing changed
+    }
+    $(this).find(".utils-item-edit-input").val($(this).closest(".utils-item").find(".utils-item-content").text());   // before curreent fetch(): current new_value -> edited content from content div
+    fetch(`${apiRoute}/user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "chatbot-user-msg-edit-prev": userMessageElem.find("input.utils-item-delete-input").val(),
+        "chatbot-user-msg-edit": $(this).find("input.utils-item-edit-input").val(),
+      }),
+    })
       .then(response => response.json())
-      .then(todolistDeleteValue => {
-        // called here to ensure validation
-        $(this).closest(".utils-item").remove();
+      .then(newUserMessageValue => {
+        userMessageElem.find("input.utils-item-delete-input").val(newUserMessageValue);   // otherwise below function will fail with consecutive updates
+        serverMessageElem.hide();
+        serverMessageElem.nextAll().remove();
+
+        return fetch(`${apiRoute}/server`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            "chatbot-server-msg-edit": serverMessageElem.find(".utils-item-content").text(),
+            "chatbot-last-user-msg": userMessageElem.find(".utils-item-content").text(),
+          }),
+        })
+          .then(response => response.json())
+          .then(newServerMessageValue => {
+            serverMessageElem.find(".utils-item-content").text(newServerMessageValue);
+            serverMessageElem.show();
+          });
       })
       .catch(error => {
         console.error(error);
       });
+  });
+}
+
+
+export function handleChatbotUserMessageDeletion(element, apiRoute) {
+  element.submit(function(event) {
+    event.preventDefault();
+    fetch(apiRoute, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "chatbot-user-msg-delete": element.find("input.utils-item-delete-input").val(),
+      }),
+    })
+      .then(() => {
+        // called here to ensure validation
+        var deleteItem = $(this).closest(".utils-item");
+        deleteItem.nextAll().remove();
+        deleteItem.remove();
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  });
+}
+
+
+export function handleChatbotServerMessageUpdate(element, apiRoute) {
+  element.submit(function(event) {
+    event.preventDefault();
+    var serverMessageElem = $(this).closest(".utils-item");
+    var userMessageElem = serverMessageElem.prev();
+    serverMessageElem.hide();
+    serverMessageElem.nextAll().remove();
+    fetch(apiRoute, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "chatbot-server-msg-update": serverMessageElem.find(".utils-item-content").text(),
+        "chatbot-last-user-msg": userMessageElem.find(".utils-item-content").text(),
+      }),
+    })
+      .then(response => response.json())
+      .then(newServerMessageValue => {
+          serverMessageElem.find(".utils-item-content").text(newServerMessageValue);
+          serverMessageElem.show();
+        })
+      .catch(error => {
+        console.error(error);
+      })
   });
 }
