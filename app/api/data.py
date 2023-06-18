@@ -1,8 +1,8 @@
 
-import json
 from datetime import date
 from io import BytesIO
-from flask import send_file, request, redirect, url_for, abort
+from flask import send_file, request, redirect, url_for, abort, json
+from flask_login import login_required
 from . import api
 from .. import db
 from ..utils import TodolistDbHandler, TimerSessionCountDbHandler, ChatbotMessageDbHandler , validate_json_data
@@ -14,6 +14,7 @@ chatbotMessageDbHandler = ChatbotMessageDbHandler(request, db)
 
 
 @api.get("/user-data/download")
+@login_required
 def download_user_data():
     # retrieve user data
     todolistItems = todolistDbHandler.read()
@@ -43,6 +44,7 @@ def download_user_data():
 
 
 @api.get("/user-data/delete")
+@login_required
 def delete_user_data():
     for dbHandler in [todolistDbHandler, timerSessionCountDbHandler, chatbotMessageDbHandler]:
         dbHandler.delete_all()
@@ -52,6 +54,7 @@ def delete_user_data():
 
 
 @api.post("/user-data/upload")
+@login_required
 def upload_user_data():
     # check if post request has uploaded file
     if "user-data" not in request.files:

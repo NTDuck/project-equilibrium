@@ -47,11 +47,11 @@
 {% endmacro %}
 
 
-{% macro utilsBar(formId="", outerDivId="", inputId="", buttonId="", inputName="", buttonType="submit", svgName="") %}
+{% macro utilsBar(formId="", outerDivId="", inputId="", buttonId="", svgName="") %}
 <form id="{{ formId }}" method="post" class="flex-none h-fit w-full">
   <div id="{{ outerDivId }}" class="flex flex-row items-center py-2 px-4 bg-sub-alt-color transition-colors duration-300 rounded-lg">
-    <input type="text" name="{{ inputName }}" id="{{ inputId }}" class="flex-grow w-20 rounded-lg caret-transparent text-text-color bg-transparent transition-colors duration-300" autocomplete="off">
-    <button type="{{ buttonType }}" id="{{ buttonId }}" class="flex-none transition-colors duration-300 text-sub-color hover:text-text-color">
+    <input type="text" id="{{ inputId }}" class="flex-grow w-20 rounded-lg caret-transparent text-text-color bg-transparent transition-colors duration-300" autocomplete="off">
+    <button type="submit" id="{{ buttonId }}" class="flex-none transition-colors duration-300 text-sub-color hover:text-text-color">
       <svg class="w-4 h-4 ml-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS[svgName].dimension }}">
         {{ ICONS[svgName].path|safe }}
       </svg>

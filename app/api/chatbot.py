@@ -1,5 +1,7 @@
 
 from flask import request, redirect, url_for, abort, jsonify
+from flask_login import login_required, current_user
+
 from . import api
 from .. import db
 from ..utils import ChatbotMessageDbHandler, text_generation
@@ -15,8 +17,9 @@ def create_user_message():
         if "chatbot-user-msg-create" in data:
             value = data.get("chatbot-user-msg-create").strip()
             if chatbotMessageDbHandler.validate(value):
-                chatbotMessageDbHandler.create(value=value, type="user")
-                chatbotMessageDbHandler.commit_session()
+                if current_user.is_authenticated:
+                    chatbotMessageDbHandler.create(value=value, type="user")
+                    chatbotMessageDbHandler.commit_session()
                 return jsonify(value)
             else:
                 abort(400)
@@ -32,9 +35,10 @@ def edit_user_message(phase):
                 prev_value = data.get("chatbot-user-msg-edit-prev")
                 new_value = data.get("chatbot-user-msg-edit")
                 if chatbotMessageDbHandler.validate(new_value):   # assume prev_value already validated
-                    chatbotMessageDbHandler.delete(prev_value, ignore_items_from_self=2)
-                    chatbotMessageDbHandler.edit(prev_value, new_value, "value")
-                    chatbotMessageDbHandler.commit_session()
+                    if current_user.is_authenticated:
+                        chatbotMessageDbHandler.delete(prev_value, ignore_items_from_self=2)
+                        chatbotMessageDbHandler.edit(prev_value, new_value, "value")
+                        chatbotMessageDbHandler.commit_session()
                     return jsonify(new_value)
                 else:
                     abort(400)
@@ -43,8 +47,9 @@ def edit_user_message(phase):
                 last_user_msg_value = data.get("chatbot-last-user-msg")
                 prev_value = data.get("chatbot-server-msg-edit")
                 new_value = text_generation(last_user_msg_value)
-                chatbotMessageDbHandler.edit(prev_value, new_value, "value")
-                chatbotMessageDbHandler.commit_session()
+                if current_user.is_authenticated:
+                    chatbotMessageDbHandler.edit(prev_value, new_value, "value")
+                    chatbotMessageDbHandler.commit_session()
                 return jsonify(new_value)
             else:
                 abort(400)
@@ -57,8 +62,9 @@ def delete_user_message():
         data = request.get_json()
         if "chatbot-user-msg-delete" in data:
             value = data.get("chatbot-user-msg-delete")
-            chatbotMessageDbHandler.delete(value)
-            chatbotMessageDbHandler.commit_session()
+            if current_user.is_authenticated:
+                chatbotMessageDbHandler.delete(value)
+                chatbotMessageDbHandler.commit_session()
             return jsonify(value)
         else:
             abort(400)
@@ -73,8 +79,9 @@ def create_server_message():
             value = data.get("chatbot-server-msg-create").strip()
             server_response = text_generation(value)
             if chatbotMessageDbHandler.validate(server_response, max_str_length=512):
-                chatbotMessageDbHandler.create(value=server_response, type="server")
-                chatbotMessageDbHandler.commit_session()
+                if current_user.is_authenticated:
+                    chatbotMessageDbHandler.create(value=server_response, type="server")
+                    chatbotMessageDbHandler.commit_session()
                 return jsonify(server_response)
             else:
                 abort(400)
@@ -88,13 +95,14 @@ def update_server_message():
         if "chatbot-server-msg-update" in data:
             # also delete all messages after
             prev_value = data.get("chatbot-server-msg-update")
-            chatbotMessageDbHandler.delete(prev_value, ignore_items_from_self=1)
+            if current_user.is_authenticated:
+                chatbotMessageDbHandler.delete(prev_value, ignore_items_from_self=1)
 
             last_user_msg_value = data.get("chatbot-last-user-msg")
             new_value = text_generation(last_user_msg_value)
-            chatbotMessageDbHandler.edit(prev_value, new_value, "value")
-
-            chatbotMessageDbHandler.commit_session()
+            if current_user.is_authenticated:
+                chatbotMessageDbHandler.edit(prev_value, new_value, "value")
+                chatbotMessageDbHandler.commit_session()
             return jsonify(new_value)
         else:
             abort(400)

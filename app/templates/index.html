@@ -4,8 +4,8 @@
 {% block content %}
 <div class="grid grid-cols-4 max-w-7xl h-full mx-auto px-8 gap-2 text-sub-color">
   <div class="col-span-1 flex flex-col items-center justify-center text-start gap-2">
-    {{ utilsBar(formId="todolist-input-form", outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", inputName="todolist-item-add", svgName="circle-plus") }}
-    {{ utilsBar(formId="todolist-search-form", outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", buttonType="submit", svgName="magnifying-glass") }}
+    {{ utilsBar(formId="todolist-input-form", outerDivId="todolist-input-outerDiv", inputId="todolist-input-input", buttonId="todolist-input-button", svgName="circle-plus") }}
+    {{ utilsBar(formId="todolist-search-form", outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", svgName="magnifying-glass") }}
     <div id="todolist-list" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y rounded-lg">
       {% for item in todolistItems %}
       {{ utilsItem(content=item.value, formClassEdit="todolist-item-edit-form", formClassDelete="todolist-item-delete-form") }}
@@ -48,7 +48,7 @@
       {% endif %}
       {% endfor %}
     </div>
-    {{ utilsBar(formId="chatbot-input-form", outerDivId="chatbot-input-outerDiv", inputId="chatbot-input-input", buttonId="chatbot-input-button", inputName="chatbot-user-msg-input", svgName="circle-right") }}
+    {{ utilsBar(formId="chatbot-input-form", outerDivId="chatbot-input-outerDiv", inputId="chatbot-input-input", buttonId="chatbot-input-button", svgName="circle-right") }}
   </div>
 </div>
 {% endblock %}

@@ -1,6 +1,8 @@
 
 import os
 import click
+import secrets
+from flask import session
 from app import create_app, db
 from app.models import Todolist
 
@@ -11,6 +13,12 @@ app = create_app(os.getenv("FLASK_CONFIG") or "default")
 # note-to-self: never modify this
 with app.app_context():
     db.create_all()
+
+
+# @app.before_request
+# def generate_csrf_token():
+#     if "csrf_token" not in session:
+#         session["csrf_token"] = secrets.token_hex(16)
 
 
 @app.shell_context_processor

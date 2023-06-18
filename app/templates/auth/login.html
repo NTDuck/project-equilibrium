@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex justify-center items-center max-w-7xl h-full mx-auto px-8">
+  <form action="{{ url_for('auth.login') }}" method="post" class="flex flex-col gap-4 caret-caret-color">
+    <input class="rounded-lg p-2 bg-sub-color text-text-color" type="text" placeholder="email" name="email">
+    <input class="rounded-lg p-2 bg-sub-color text-text-color" type="text" placeholder="password" name="password">
+    <div class="flex flex-row items-center justify-around">
+      <a href="{{ url_for('auth.register') }}">
+        register
+      </a>
+      <button type="submit">login</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

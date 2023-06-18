@@ -85,6 +85,8 @@ $(document).ready(function() {
     })
       .then(response => response.json())
       .then(todolistInsertValue => {
+        // clear form input after submission
+
         var utilsItem = createUtilsItem(todolistInsertValue, "todolist-item-edit-form", "todolist-item-delete-form");
         $("#todolist-list").append(utilsItem);   // append to parent div as last element
         const utilsItemElem = $("#todolist-list").find(".utils-item:last");

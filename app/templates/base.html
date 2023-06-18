@@ -41,7 +41,15 @@
         {{ svgNavbar("main.stats", "chart-simple") }}
         {{ svgNavbar("main.settings", "gear") }}
         <div class="flex-grow"></div>
-        {{ svgNavbar("main.settings", "bell") }}
+        {% if current_user.is_authenticated %}
+        <!-- placeholder -->
+        {{ svgNavbar("main.index", "user") }}
+        {{ svgNavbar("main.index", "bell") }}
+        {{ svgNavbar("auth.logout", "right-from-bracket") }}
+        {% else %}
+        {{ svgNavbar("main.index", "bell") }}
+        {{ svgNavbar("auth.login", "user_") }}
+        {% endif %}
       </div>
     </div>
   </nav>

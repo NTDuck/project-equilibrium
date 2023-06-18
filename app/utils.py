@@ -3,13 +3,15 @@ import os
 import json
 from datetime import date
 
+from flask_login import current_user
 from transformers import pipeline
 
 from config import Config
-from .models import Todolist, TimerSessionCount, ChatbotMessage
+from .models import User, Todolist, TimerSessionCount, ChatbotMessage
 
 
 class BaseDbHandler:
+    # CRUD opeartions only on current user
     def __init__(self, request, db, modelClass):
         self.request = request
         self.db = db
@@ -26,24 +28,45 @@ class BaseDbHandler:
         self.db.session.commit()
 
     def create(self, **attrs):
-        item = self.modelClass(**attrs)
+        item = self.modelClass(user=current_user, **attrs)
         self.db.session.add(item)
 
     def create_all(self, insert_array: list[dict[str, str]]):
         if not self.read():
             for attrs in insert_array:
-                item = self.modelClass(**attrs)
+                item = self.modelClass(user=current_user, **attrs)
                 self.db.session.add(item)
 
     def read(self) -> list:
-        return self.modelClass.query.all()
+        # pascal case to snake case
+        # warning: create multiple instances of string, should be optimized
+        def convert_pascal_to_snake(ClassName: type) -> str:
+            s = ClassName.__name__
+            for i in s:
+                if i.isupper():
+                    s = s.replace(i, f"_{i.lower()}")
+            return s.strip("_")
+        return getattr(current_user, convert_pascal_to_snake(self.modelClass))
 
     def edit(self, prev_value, new_value, attr):
-        item = self.modelClass.query.filter_by(**{attr: prev_value}).first()
+        item = self.modelClass.query.filter_by(user=current_user, **{attr: prev_value}).first()
         setattr(item, attr, new_value)
     
+    # should be unique to User table
     def delete_all(self):
-        self.modelClass.query.delete()
+        self.modelClass.query.filter_by(user=current_user).delete()
+
+
+class UserDbHandler(BaseDbHandler):
+    def __init__(self, request, db):
+        super().__init__(request, db, User)
+
+    def create(self, **attrs):
+        item = self.modelClass(**attrs)
+        self.db.session.add(item)
+
+    def delete_all(self):
+        return super().delete_all()
 
 
 class TodolistDbHandler(BaseDbHandler):
