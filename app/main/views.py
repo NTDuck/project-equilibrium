@@ -1,15 +1,11 @@
 
-from flask import render_template, request
+from flask import render_template
 from flask_login import current_user, login_required
 
 from . import main
-from .. import db
-from ..utils import TodolistDbHandler, TimerSessionCountDbHandler, ChatbotMessageDbHandler, handle_timer_data
-
-
-todolistDbHandler = TodolistDbHandler(request, db)
-timerSessionCountDbHandler = TimerSessionCountDbHandler(request, db)
-chatbotMessageDbHandler = ChatbotMessageDbHandler(request, db)
+from .. import todolistDbHandler, timerSessionCountDbHandler, chatbotMessageDbHandler
+from ..utils import handle_timer_data
+from config import Config
 
 
 @main.route("/")
@@ -18,9 +14,9 @@ def index():
         todolistItems = todolistDbHandler.read()
         chatbotMessages = chatbotMessageDbHandler.read()
     else:
-        # should implement some example messages
-        todolistItems = []
-        chatbotMessages = []
+        # implement some example messages
+        todolistItems = [{"value": i} for i in Config.TODOLIST_EXAMPLE_MESSAGES]
+        chatbotMessages = [{"value": i, "type": "user" if Config.CHATBOT_EXAMPLE_MESSAGES.index(i)%2 == 0 else "server"} for i in Config.CHATBOT_EXAMPLE_MESSAGES]
     return render_template("index.html", todolistItems=todolistItems, chatbotMessages=chatbotMessages)
 
 

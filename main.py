@@ -1,10 +1,7 @@
 
 import os
 import click
-import secrets
-from flask import session
 from app import create_app, db
-from app.models import Todolist
 
 
 app = create_app(os.getenv("FLASK_CONFIG") or "default")
@@ -21,17 +18,10 @@ with app.app_context():
 #         session["csrf_token"] = secrets.token_hex(16)
 
 
-@app.shell_context_processor
-def shell_context_processor():
-    return dict(db=db, TodolistItems=Todolist)
-
-
 @app.cli.command()
 @click.argument("test_names", nargs=-1)
 def test(test_names):
-
     import unittest
-
     if test_names:
         tests = unittest.TestLoader().loadTestsFromNames(test_names)
     else:

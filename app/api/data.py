@@ -4,13 +4,9 @@ from io import BytesIO
 from flask import send_file, request, redirect, url_for, abort, json
 from flask_login import login_required
 from . import api
-from .. import db
-from ..utils import TodolistDbHandler, TimerSessionCountDbHandler, ChatbotMessageDbHandler , validate_json_data
+from .. import todolistDbHandler, timerSessionCountDbHandler, chatbotMessageDbHandler
+from ..utils import validate_json_data
 
-
-todolistDbHandler = TodolistDbHandler(request, db)
-timerSessionCountDbHandler = TimerSessionCountDbHandler(request, db)
-chatbotMessageDbHandler = ChatbotMessageDbHandler(request, db)
 
 
 @api.get("/user-data/download")

@@ -1,17 +1,13 @@
 
 import os
 from datetime import date
-from flask import jsonify, request, redirect, url_for
+from flask import jsonify, request, redirect, url_for, abort
 from flask_login import current_user, login_required
 
 from config import Config
 from . import api
-from .. import db
-from ..utils import TimerSessionCountDbHandler
+from .. import timerSessionCountDbHandler
 from ..models import TimerSessionCount
-
-
-timerSessionCountDbHandler = TimerSessionCountDbHandler(request, db)
 
 
 @api.get("/timer/config")
@@ -34,6 +30,8 @@ def get_timer_gifs(folder):
 
 @api.post("/timer/session-count/update")
 def update_timer_session_count():
+    if not request.is_json:
+        abort(400)
     if "session-count" in request.json:
         if current_user.is_authenticated:
             item = TimerSessionCount.query.filter_by(user=current_user, date=date.today()).first()
@@ -42,7 +40,6 @@ def update_timer_session_count():
             else:   # non-existent query
                 timerSessionCountDbHandler.create(date=date.today(), session_count=1)
             timerSessionCountDbHandler.commit_session()
-    return redirect(url_for("main.index"))   # server returns 500 otherwise
 
 
 @api.get("/timer/session-count/get")

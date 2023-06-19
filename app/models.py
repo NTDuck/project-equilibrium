@@ -52,19 +52,3 @@ class ChatbotMessage(db.Model):
     type = db.Column(db.String(8), nullable=False, default="server")
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-
-
-
-"""
-1. repurpose models.py:
-- new user table
-- method: CREATE, READ, UPDATE (attr), DELETE
-- each user has an (not necessarily unique) instance of model subclasses
-- update each model subclass for ref to user
-2. update entire system based on user state
-- logged in: required for db update; 
-- not logged in: save data somewhere request-lifespan; session perhaps. should look into g obj
-- logged in: save data as normal, now with additional info: user
-3. store user to sessions? kinda make the current instance of user available for CRUD operations on model tables
-P/S: update security features
-"""

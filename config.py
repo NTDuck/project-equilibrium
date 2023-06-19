@@ -2,6 +2,17 @@
 class Config:
     SECRET_KEY = "dev"
 
+    TODOLIST_EXAMPLE_MESSAGES = [
+        "hello, dear user!",
+        "this is a simple todolist.",
+        "you can add, edit, or delete items however you like!",
+        "oh, please also play with the neco-arc in the middle.",
+    ]
+    CHATBOT_EXAMPLE_MESSAGES = [
+        "this is an AI-powered chatbot! you can type in some text,",
+        "and the server will respond with something. just don't expect much.",
+    ]
+
     TIMER_WORK_SESSION_LENGTH = 45
     TIMER_SHORT_BREAK_SESSION_LENGTH = 5
     TIMER_LONG_BREAK_SESSION_LENGTH = 15
