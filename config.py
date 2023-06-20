@@ -23,6 +23,22 @@ class Config:
     USER_INPUT_MIN_STRING_LENGTH = 0
     USER_INPUT_MAX_STRING_LENGTH = 128
 
+    """
+    username regex:
+    from 8 to 32 characters
+    contains lowercase letters, numbers, and underscores only
+    consecutive underscores are not allowed
+    numbers or underscores are not allowed at the beginning
+    underscores are not allowed at the end
+    """
+    USER_USERNAME_REGEX_PATTERN = r"^(?![_\d])[a-z\d_]+(?<!_){8,32}$"
+    """
+    password regex:
+    from 8 to 32 characters
+    contains at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special character
+    """
+    USER_PASSWORD_REGEX_PATTERN = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~!@#$%^&*<>?])[A-Za-z\d@~!@#$%^&*<>?]{8,32}$"
+
     USER_DATA_ALLOWED_FILE_EXTENSIONS = {".json"}
 
     HUGGINGFACE_MODEL = "distilgpt2"

@@ -60,7 +60,7 @@ def upload_user_data():
 
     # check if file is valid
     json_data = validate_json_data(file)
-    if not json_data:
+    if json_data is None:
         abort(400)
 
     # handle json data upon validation

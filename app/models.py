@@ -6,9 +6,9 @@ from . import db, login_manager
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(128), unique=True, index=True)
-    username = db.Column(db.String(128), unique=True, index=True)
-    password_hash = db.Column(db.String(128))
+    email = db.Column(db.String(256), unique=True, index=True)
+    username = db.Column(db.String(32), unique=True, index=True)
+    password_hash = db.Column(db.String(512))
 
     todolist = db.relationship("Todolist", backref="user", lazy=True)
     timer_session_count = db.relationship("TimerSessionCount", backref="user", lazy=True)

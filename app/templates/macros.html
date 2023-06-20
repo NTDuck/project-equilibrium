@@ -46,7 +46,7 @@
 {{ svgBaseButton(svgName=svgName, svgClass="w-[1.1rem] h-[1.1rem]", buttonId=buttonId) }}
 {% endmacro %}
 
-
+<!-- note-to-self: if modify utilsBar and/or utilsItem, update utils.js -->
 {% macro utilsBar(formId="", outerDivId="", inputId="", buttonId="", svgName="") %}
 <form id="{{ formId }}" method="post" class="flex-none h-fit w-full">
   <div id="{{ outerDivId }}" class="flex flex-row items-center py-2 px-4 bg-sub-alt-color transition-colors duration-300 rounded-lg">

@@ -44,18 +44,16 @@ def register():
         email = request.form.get("email")
         username = request.form.get("username")
         password = request.form.get("password")
-
-        # check if email/username already exists
-        if User.query.filter_by(email=email).first():
-            # flash msg: email already in use
+        
+        # validation
+        validated_email = userDbHandler.validate_email(email)
+        validated_username = userDbHandler.validate_username(username)
+        validated_password = userDbHandler.validate_password(password)
+        if any([i is None for i in [validated_email, validated_username, validated_password]]):
             abort(400)
-        if User.query.filter_by(username=username).first():
-            # flash msg: username already registered
-            abort(400)
-        # do something to validate form credentials, preferably regex
 
         # if everything is okay
-        userDbHandler.create(email=email, username=username, password=password)
+        userDbHandler.create(email=validated_email, username=validated_username, password=validated_password)
         userDbHandler.commit_session()
         return redirect(url_for("auth.login"))
     return render_template("auth/register.html")

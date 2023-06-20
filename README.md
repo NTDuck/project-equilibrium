@@ -46,7 +46,7 @@ $ source venv/bin/activate
 ```
 Alternatively, for ensured version conflict/incompatibility:
 ```
-(venv) $ pip install flask flask-moment flask-sqlalchemy flask-migrate flask-login Flask-HTMLmin python-dotenv
+(venv) $ pip install flask flask-moment flask-sqlalchemy flask-migrate flask-login Flask-HTMLmin python-dotenv email-validator
 (venv) $ pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
 (venv) % pip install transformers
 ```

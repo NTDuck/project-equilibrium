@@ -1,9 +1,11 @@
 
 import os
-import json
+import re
 from datetime import date
 
+from flask import json
 from flask_login import current_user
+from email_validator import validate_email, EmailNotValidError, EmailSyntaxError
 from transformers import pipeline
 
 from config import Config
@@ -17,11 +19,11 @@ class BaseDbHandler:
         self.db = db
         self.table = table
 
-    def validate(self, value: str, min_str_length=Config.USER_INPUT_MIN_STRING_LENGTH, max_str_length=Config.USER_INPUT_MAX_STRING_LENGTH) -> bool:
+    def validate(self, value: str, unique_attr="value", min_str_length=Config.USER_INPUT_MIN_STRING_LENGTH, max_str_length=Config.USER_INPUT_MAX_STRING_LENGTH) -> bool:
         return all([
             min_str_length < len(value) < max_str_length,
             not value.isspace(),
-            value not in [getattr(item, "value") for item in self.read()],
+            self.table.query.filter_by(**{unique_attr: value}).first() is None,
         ])
     
     def commit_session(self):
@@ -61,9 +63,33 @@ class UserDbHandler(BaseDbHandler):
     def __init__(self, request, db):
         super().__init__(request, db, User)
 
+    def validate_email(self, email: str) -> str | None:
+        email = email.strip()
+        if not self.validate(email, unique_attr="email", max_str_length=256):
+            return None
+        try:
+            validated_email = validate_email(email, check_deliverability=True)
+            return validated_email.normalized
+        except EmailNotValidError or EmailSyntaxError:
+            return None
+        
+    def validate_username(self, username: str) -> str | None:
+        username = username.lower().strip()
+        return username if all([
+            re.match(pattern=Config.USER_USERNAME_REGEX_PATTERN, string=username) is not None,
+            self.table.query.filter_by(username=username).first() is None,
+        ]) else None
+        
+    def validate_password(self, password: str) -> str | None:
+        password = password.strip()
+        return password if re.match(pattern=Config.USER_PASSWORD_REGEX_PATTERN, string=password) is not None else None
+
     def create(self, **attrs):
         item = self.table(**attrs)
         self.db.session.add(item)
+
+    def read(self):
+        return self.table.query.all()
 
     # why does this exist lmao
     def delete_all(self):
@@ -113,69 +139,69 @@ def is_file_allowed(filename, allowed_file_exts) -> bool:
     return filetype in allowed_file_exts
 
 
-def validate_json_data(file) -> dict | bool:
+def validate_json_data(file) -> dict | None:
     # check if file is empty
     # warning: event never received, error might occur in production
     if file.filename == "":
-        return False
+        return None
 
     if not is_file_allowed(file.filename, Config.USER_DATA_ALLOWED_FILE_EXTENSIONS):
-        return False
+        return None
 
     file_content = file.read()
     json_data = json.loads(file_content)
     
     # check if data is readable dict
     if not isinstance(json_data, dict):
-        return False
+        return None
     
     # check if data contains only valid keys
     if json_data.keys() != {"todolist", "timer-session-count", "chatbot-messages"}:
-        return False
+        return None
     
     # check if data.todolist contains only valid values
     todolists = json_data["todolist"]
     if len(todolists) != len(set(todolists)):
-        return False
+        return None
     for value in todolists:
         if any([
             not isinstance(value, str),
             len(value) >= 128,
             value.isspace(),   # check if value contains only whitespace
         ]):
-            return False
+            return None
     
     timer_session_counts = json_data["timer-session-count"]
     date_strings = [item[0] for item in timer_session_counts]
     session_counts = [item[1] for item in timer_session_counts]   # can contain identical values
 
     if len(date_strings) != len(set(date_strings)):
-        return False
+        return None
     for session_count in session_counts:
         if any([
             not isinstance(session_count, int),
             session_count < 0,
         ]):
-            return False
+            return None
     try:
         for date_string in date_strings:
             date.fromisoformat(date_string)   # check if date_string is stored in valid iso format
     except ValueError:   # raised if date_string is not in valid iso format
-        return False
+        return None
 
     chatbot_messages = json_data["chatbot-messages"]
     values = [item[0] for item in chatbot_messages]
     types = [item[1] for item in chatbot_messages]
 
     if len(values) != len(set(values)):
-        return False
+        return None
     for value in values:
         if any([
             not isinstance(value, str),
             len(value) >= 512,
             value.isspace(),   # check if value contains only whitespace
         ]):
-            return False
+            return None
     if any([
         # check if types follows pattern ["user", "server"]
         all([
@@ -184,7 +210,7 @@ def validate_json_data(file) -> dict | bool:
         ]),
         types != ["user", "server"] * (len(types) // 2)
     ]):
-        return False
+        return None
     
     return json_data   # upon validation
 
