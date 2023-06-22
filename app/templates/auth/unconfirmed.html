@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}account confirmation{% endblock %}
+
+{% block content %}
+<div class="flex flex-col justify-center items-center gap-8 max-w-7xl h-full mx-auto px-8">
+  <div class="flex flex-col gap-2 w-1/2">
+    <div class="w-full">
+      user {{ current_user.username }},
+    </div>
+    <div>
+      your account has not been confirmed.
+    </div>
+    <div>
+      we have sent you an email with a confirmation link.
+    </div>
+  </div>
+  <a class="rounded-lg px-3 py-2 transition-colors bg-sub-color text-text-color hover:bg-sub-alt-color hover:text-main-color focus:bg-sub-alt-color focus:text-main-color" href="{{ url_for('auth.resend_confirmation') }}">resend</a>
+</div>
+{% endblock %}

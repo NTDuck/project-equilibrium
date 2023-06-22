@@ -1,6 +1,10 @@
 
+from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
+from jwt import decode, encode
+
+from config import Config
 from . import db, login_manager
 
 
@@ -9,6 +13,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(256), unique=True, index=True)
     username = db.Column(db.String(32), unique=True, index=True)
     password_hash = db.Column(db.String(512))
+
+    # state
+    confirmed = db.Column(db.Boolean, default=False)
 
     todolist = db.relationship("Todolist", backref="user", lazy=True)
     timer_session_count = db.relationship("TimerSessionCount", backref="user", lazy=True)
@@ -24,6 +31,42 @@ class User(UserMixin, db.Model):
     
     def verify_password(self, password: str):
         return check_password_hash(self.password_hash, password=password)
+    
+    def generate_confirmation_token(self) -> str:
+        return encode({
+            "time": datetime.utcnow().isoformat(),
+            "id": self.id,
+            "email": self.email,
+            "username": self.username,
+        }, key=Config.SECRET_KEY, algorithm=Config.CONFIRMATION_TOKEN_ALGORITHM)
+
+    def confirm(self, token: str, expiration=Config.CONFIRMATION_TOKEN_EXPIRATION) -> bool:
+        # retrieve token
+        try:
+            credentials = decode(token, key=Config.SECRET_KEY, algorithms=Config.CONFIRMATION_TOKEN_ALGORITHM)
+        except:
+            return False
+
+        # validate token
+        if credentials.keys() != {"time", "id", "email", "username"}:
+            return False
+        
+        time_generated = datetime.fromisoformat(credentials.get("time"))
+        id = credentials.get("id")
+        email = credentials.get("email")
+        username = credentials.get("username")
+
+        # check if token is expired
+        time_now = datetime.utcnow()
+        time_delta = time_now - time_generated
+        if time_delta.seconds > expiration:
+            return False
+        
+        return all([
+            id == self.id,
+            email == self.email,
+            username == self.username,
+        ])
 
 
 @login_manager.user_loader

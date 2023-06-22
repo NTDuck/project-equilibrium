@@ -84,9 +84,10 @@ class UserDbHandler(BaseDbHandler):
         password = password.strip()
         return password if re.match(pattern=Config.USER_PASSWORD_REGEX_PATTERN, string=password) is not None else None
 
-    def create(self, **attrs):
+    def create(self, **attrs) -> User:
         item = self.table(**attrs)
         self.db.session.add(item)
+        return item
 
     def read(self):
         return self.table.query.all()
@@ -216,6 +217,8 @@ def validate_json_data(file) -> dict | None:
 
 
 def handle_timer_data(data: list[TimerSessionCount]):
+    if not data:
+        return [], 1
     item_session_counts = [item.session_count for item in data]
     timer_data = [[item.date.strftime("%b"), item.date.strftime("%d"), item.session_count] for item in data]
     return timer_data, max(item_session_counts)
@@ -230,3 +233,14 @@ def text_generation(input_text: str) -> str:
         max_length=Config.HUGGINGFACE_MODEL_MAX_LENGTH,
     )
     return res[0].get("generated_text").strip().replace("\n", "")
+
+
+"""
+note-to-self: will need to implement task queue with celery + redis: https://stackabuse.com/asynchronous-tasks-using-flask-redis-and-celery/
+
+TODOLIST:
+- implement daily mail count to avoid being locked out of account (cap: 2000)
+- password reset (via gmail)
+- password update (direct)
+- user confirmation upon registration
+"""

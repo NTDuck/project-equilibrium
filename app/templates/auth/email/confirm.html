@@ -1,0 +1,6 @@
+<p>dear {{ user.username }},</p><br>
+<p>welcome to project-equilibrium.</p>
+<p>to confirm your account, please <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">click here</a> within {{ expiration }}.</p><br>
+<p>sincerely,</p>
+<p>the devs.</p>
+<p><small><i>this is system-generated response. please do not reply to this email address.</i></small></p>

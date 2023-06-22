@@ -3,6 +3,7 @@ from flask import Flask, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_mail import Mail
 from flask_moment import Moment
 from flask_htmlmin import HTMLMIN
 
@@ -12,6 +13,7 @@ from config import config
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
+mail = Mail()
 htmlmin = HTMLMIN(remove_comments=True, remove_empty_space=True)
 moment = Moment()
 
@@ -37,7 +39,7 @@ def create_app(config_name):
     config[config_name].init_app(app)
 
     for ext in (
-        db, htmlmin, login_manager, moment,
+        db, htmlmin, login_manager, mail, moment,
     ):
         ext.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)

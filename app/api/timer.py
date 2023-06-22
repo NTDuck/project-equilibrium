@@ -1,7 +1,7 @@
 
 import os
 from datetime import date
-from flask import jsonify, request, redirect, url_for, abort
+from flask import jsonify, request, abort
 from flask_login import current_user, login_required
 
 from config import Config

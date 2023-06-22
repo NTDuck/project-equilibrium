@@ -1,6 +1,9 @@
 
+import os
+
+
 class Config:
-    SECRET_KEY = "dev"
+    SECRET_KEY = os.environ.get("SECRET_KEY")
 
     TODOLIST_EXAMPLE_MESSAGES = [
         "hello, dear user!",
@@ -39,7 +42,21 @@ class Config:
     """
     USER_PASSWORD_REGEX_PATTERN = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~!@#$%^&*<>?])[A-Za-z\d@~!@#$%^&*<>?]{8,32}$"
 
+    CONFIRMATION_TOKEN_ALGORITHM = "HS256"
+    CONFIRMATION_TOKEN_EXPIRATION = 3600   # seconds
+
     USER_DATA_ALLOWED_FILE_EXTENSIONS = {".json"}
+
+    """
+    uses Gmail SMTP server: https://support.google.com/a/answer/176600
+    implement daily mail count to avoid being locked out of account
+    """
+    MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+    MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))   # uses 
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+    MAIL_DEFAULT_SENDER = "project-equilibrium@gmail.com"
 
     HUGGINGFACE_MODEL = "distilgpt2"
     HUGGINGFACE_MODEL_MIN_LENGTH = 20
