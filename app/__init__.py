@@ -1,5 +1,5 @@
 
-from flask import Flask, redirect, url_for, request
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -22,15 +22,6 @@ login_manager.login_view = "auth.login"
 @login_manager.unauthorized_handler
 def unauthorized():
     return redirect(url_for("auth.login"))
-
-
-# placed here to avoid circular dependency
-from .utils import UserDbHandler, TodolistDbHandler, TimerSessionCountDbHandler, ChatbotMessageDbHandler
-
-userDbHandler = UserDbHandler(request, db)
-todolistDbHandler = TodolistDbHandler(request, db)
-timerSessionCountDbHandler = TimerSessionCountDbHandler(request, db)
-chatbotMessageDbHandler = ChatbotMessageDbHandler(request, db)
 
 
 def create_app(config_name):

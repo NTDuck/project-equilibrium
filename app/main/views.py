@@ -3,16 +3,16 @@ from flask import render_template
 from flask_login import current_user, login_required
 
 from . import main
-from .. import todolistDbHandler, timerSessionCountDbHandler, chatbotMessageDbHandler
 from ..utils import handle_timer_data
+from ..models import Todolist, TimerSessionCount, ChatbotMessage
 from config import Config
 
 
 @main.route("/")
 def index():
     if current_user.is_authenticated:
-        todolistItems = todolistDbHandler.read()
-        chatbotMessages = chatbotMessageDbHandler.read()
+        todolistItems = getattr(current_user, Todolist.__tablename__)
+        chatbotMessages = getattr(current_user, ChatbotMessage.__tablename__)
     else:
         # implement some example messages
         todolistItems = [{"value": i} for i in Config.TODOLIST_EXAMPLE_MESSAGES]
@@ -29,7 +29,7 @@ def about():
 @main.route("/stats")
 @login_required
 def stats():
-    raw_timer_data = timerSessionCountDbHandler.read()
+    raw_timer_data = getattr(current_user, TimerSessionCount.__tablename__)
     timer_data, max_session_count = handle_timer_data(raw_timer_data)
     return render_template("views/stats.html", timer_data=timer_data, max_session_count=max_session_count)
 

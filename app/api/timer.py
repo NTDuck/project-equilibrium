@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 
 from config import Config
 from . import api
-from .. import timerSessionCountDbHandler
+from .. import db
 from ..models import TimerSessionCount
 
 
@@ -32,18 +32,24 @@ def get_timer_gifs(folder):
 def update_timer_session_count():
     if not request.is_json:
         abort(400)
-    if "session-count" in request.json:
-        if current_user.is_authenticated:
-            item = TimerSessionCount.query.filter_by(user=current_user, date=date.today()).first()
+    if not "session-count" in request.json:
+        abort(400)
+    if current_user.is_authenticated:
+        item = db.session.execute(db.select(TimerSessionCount).filter_by(user=current_user, date=date.today())).scalar_one()
+        try:
             if item is not None:   # query already exists
-                timerSessionCountDbHandler.edit(item)
+                item.session_count += 1
             else:   # non-existent query
-                timerSessionCountDbHandler.create(date=date.today(), session_count=1)
-            timerSessionCountDbHandler.commit_session()
+                item = TimerSessionCount(user=current_user, date=date.today(), session_count=1)
+                db.session.add(item)
+        except ValueError:
+            abort(400)
+        else:
+            db.session.commit()
 
 
 @api.get("/timer/session-count/get")
 @login_required
 def get_timer_session_count():
-    timer_session_counts = timerSessionCountDbHandler.read()   # list[list[str, int]]
+    timer_session_counts = getattr(current_user, TimerSessionCount.__tablename__)   # list[list[str, int]]
     return jsonify(timer_session_counts)

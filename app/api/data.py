@@ -1,11 +1,15 @@
 
 from datetime import date
 from io import BytesIO
+
 from flask import send_file, request, redirect, url_for, abort, json
-from flask_login import login_required
+from flask_login import login_required, current_user
+from sqlalchemy import delete
+
 from . import api
-from .. import todolistDbHandler, timerSessionCountDbHandler, chatbotMessageDbHandler
+from .. import db
 from ..utils import validate_json_data
+from ..models import Todolist, TimerSessionCount, ChatbotMessage
 
 
 
@@ -13,14 +17,14 @@ from ..utils import validate_json_data
 @login_required
 def download_user_data():
     # retrieve user data
-    todolistItems = todolistDbHandler.read()
-    todolistData = [todolistItem.value for todolistItem in todolistItems]
+    todolistItems = getattr(current_user, Todolist.__tablename__)
+    todolistData = [getattr(item, "value") for item in todolistItems]
 
-    timerSessionCounts = timerSessionCountDbHandler.read()
-    timerSessionCountData = [[timerSessionCount.date.isoformat(), timerSessionCount.session_count] for timerSessionCount in timerSessionCounts]
+    timerSessionCounts = getattr(current_user, TimerSessionCount.__tablename__)
+    timerSessionCountData = [[getattr(item, "date").isoformat(), getattr(item, "session_count")] for item in timerSessionCounts]
 
-    chatbotMessages = chatbotMessageDbHandler.read()
-    chatbotMessagesData = [[chatbotMessage.value, chatbotMessage.type] for chatbotMessage in chatbotMessages]
+    chatbotMessages = getattr(current_user, ChatbotMessage.__tablename__)
+    chatbotMessagesData = [[getattr(item, "value"), getattr(item, "type")] for item in chatbotMessages]
 
     json_data = json.dumps({
         "todolist": todolistData,
@@ -42,10 +46,10 @@ def download_user_data():
 @api.get("/user-data/delete")
 @login_required
 def delete_user_data():
-    for dbHandler in [todolistDbHandler, timerSessionCountDbHandler, chatbotMessageDbHandler]:
-        dbHandler.delete_all()
+    for table in [Todolist, TimerSessionCount, ChatbotMessage]:
+        db.session.execute(delete(table).where(table.user == current_user))
     # note-to-self: send fetch request to frontend to clear localStorage
-    todolistDbHandler.commit_session()   # could be any dbHandler
+    db.session.commit()
     return redirect(url_for("main.index"))
 
 
@@ -66,17 +70,30 @@ def upload_user_data():
     # handle json data upon validation
     rawTodolistItems = json_data.get("todolist")   # list[str]
     todolistItems = [{"value": value} for value in rawTodolistItems]   # list[dict[str, str]]
-    todolistDbHandler.create_all(todolistItems)
 
     rawTimerSessionCounts = json_data.get("timer-session-count")   # list[list[str, str]]
     timerSessionCounts = [{"date": date.fromisoformat(date_string), "session_count": session_count} for [date_string, session_count] in rawTimerSessionCounts]   # list[dict[str, str]]
-    timerSessionCountDbHandler.create_all(timerSessionCounts)
 
     rawChatbotMessages = json_data.get("chatbot-messages")   # list[list[str, str]]
     chatbotMessages = [{"value": value, "type": type} for [value, type] in rawChatbotMessages]   # list[dict[str, str]]
-    chatbotMessageDbHandler.create_all(chatbotMessages)
 
-    todolistDbHandler.commit_session()   # could be any dbHandler
+    insert_array = {
+        Todolist: todolistItems,
+        TimerSessionCount: timerSessionCounts,
+        ChatbotMessage: chatbotMessages,
+    }
+
+    try:
+        for table in insert_array.keys():
+            if getattr(current_user, table.__tablename__):
+                continue
+            for attrs in insert_array.get(table):
+                item = table(user=current_user, **attrs)
+                db.session.add(item)
+    except ValueError:
+        abort(400)
+    else:
+        db.session.commit()
     return redirect(url_for("main.index"))
 
 

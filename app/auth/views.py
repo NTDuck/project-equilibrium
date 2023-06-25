@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 from config import Config
 from . import auth
-from .. import userDbHandler
+from .. import db
 from ..models import User
 from ..email import send_email
 
@@ -30,9 +30,9 @@ def unconfirmed():
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-        user = User.query.filter_by(email=email).first()
+        email = request.form.get("email").strip()
+        password = request.form.get("password").strip()
+        user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one()
         
         # will implement real things later, abort for now
         if user is None:
@@ -61,23 +61,20 @@ def logout():
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        email = request.form.get("email")
-        username = request.form.get("username")
-        password = request.form.get("password")
-        
-        # validation
-        validated_email = userDbHandler.validate_email(email)
-        validated_username = userDbHandler.validate_username(username)
-        validated_password = userDbHandler.validate_password(password)
-        if not all([validated_email, validated_username, validated_password]):
-            abort(400)
+        email = request.form.get("email").strip()
+        username = request.form.get("username").strip()
+        password = request.form.get("password").strip()
 
-        # if everything is okay
-        user = userDbHandler.create(email=validated_email, username=validated_username, password=validated_password)
-        userDbHandler.commit_session()
+        try:
+            user = User(email=email, username=username, password=password)
+        except ValueError:
+            abort(400)
+        else:
+            db.session.add(user)
+            db.session.commit()
 
         token = user.generate_confirmation_token()
-        send_email([validated_email], "confirm your account", "auth/email/confirm", user=user, token=token, expiration=f"{Config.CONFIRMATION_TOKEN_EXPIRATION // 60} minutes")
+        send_email([getattr(user, "email")], "confirm your account", "auth/email/confirm", user=user, token=token, expiration=f"{Config.CONFIRMATION_TOKEN_EXPIRATION // 60} minutes")
 
         return redirect(url_for("auth.login"))
     return render_template("auth/register.html")
@@ -88,9 +85,9 @@ def register():
 def confirm(token):
     if getattr(current_user, "confirmed"):
         return redirect(url_for("main.index"))
-    if current_user.confirm(token):
+    if current_user.validate_confirmation_token(token):
         setattr(current_user, "confirmed", True)
-        userDbHandler.commit_session()
+        db.session.commit()
         # flash msg
     else:
         ...
