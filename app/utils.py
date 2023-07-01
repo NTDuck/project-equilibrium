@@ -1,6 +1,6 @@
 
 import os
-from datetime import date
+from datetime import date, timedelta
 
 from flask import json
 from transformers import pipeline
@@ -11,7 +11,6 @@ from config import Config
 def is_file_allowed(filename, allowed_file_exts) -> bool:
     filetype = os.path.splitext(filename)[-1]
     return filetype in allowed_file_exts
-
 
 def validate_json_data(file) -> dict | None:
     # check if file is empty
@@ -67,12 +66,31 @@ def validate_json_data(file) -> dict | None:
     return json_data
 
 
-def handle_timer_data(data):
-    if not data:
-        return [], 1
-    item_session_counts = [item.session_count for item in data]
-    timer_data = [[item.date.strftime("%b"), item.date.strftime("%d"), item.session_count] for item in data]
-    return timer_data, max(item_session_counts)
+def delta(l: list) -> list:
+    return [l[ind + 1] - l[ind] for ind, elem in enumerate(l) if elem != l[-1]]
+
+def current_streak(l: list[date]) -> int:
+    def first_consecutive(l: list, val) -> int:
+        m = 0
+        for i in l:
+            if i != val:
+                break
+            m += 1
+        return m
+    return first_consecutive(delta(l)[::-1], timedelta(days=1)) + 1
+            
+def longest_streak(l: list[date]) -> int:
+    def max_consecutive(l: list, val) -> int:
+        m = tmp = 0
+        for i in l:
+            if i == val:
+                tmp += 1
+            else:
+                if tmp > m:
+                    m = tmp
+                tmp = 0
+        return m
+    return max_consecutive(delta(l), timedelta(days=1)) + 1
 
 
 # warning: should run on multiple threads
@@ -84,13 +102,3 @@ def text_generation(input_text: str) -> str:
         max_length=Config.HUGGINGFACE_MODEL_MAX_LENGTH,
     )
     return res[0].get("generated_text").strip().replace("\n", "")
-
-
-"""
-note-to-self: will need to implement task queue with celery + redis: https://stackabuse.com/asynchronous-tasks-using-flask-redis-and-celery/
-
-TODOLIST:
-- implement daily mail count to avoid being locked out of account (cap: 2000)
-- password reset (via gmail)
-- password update (direct)
-"""

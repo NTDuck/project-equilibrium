@@ -2,10 +2,9 @@
 from flask import render_template
 from flask_login import current_user, login_required
 
-from . import main
-from ..utils import handle_timer_data
-from ..models import Todolist, TimerSessionCount, ChatbotMessage
 from config import Config
+from . import main
+from ..models import Todolist, ChatbotMessage
 
 
 @main.route("/")
@@ -27,11 +26,8 @@ def about():
 
 
 @main.route("/stats")
-@login_required
 def stats():
-    raw_timer_data = getattr(current_user, TimerSessionCount.__tablename__)
-    timer_data, max_session_count = handle_timer_data(raw_timer_data)
-    return render_template("views/stats.html", timer_data=timer_data, max_session_count=max_session_count)
+    return render_template("views/stats.html")
 
 
 @main.route("/settings")

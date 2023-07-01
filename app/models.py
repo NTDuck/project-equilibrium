@@ -32,6 +32,7 @@ class User(UserMixin, db.Model):
 
     # state
     confirmed = db.Column(db.Boolean, default=False)
+    date_joined = db.Column(db.Date)
 
     todolist = db.relationship("Todolist", backref="user", lazy=True)
     timer_session_count = db.relationship("TimerSessionCount", backref="user", lazy=True)

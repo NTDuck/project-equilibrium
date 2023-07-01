@@ -1,16 +1,4 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="flex items-center justify-center max-w-7xl h-full mx-auto px-8">
-  <div class="flex overflow-x-scroll flex-row w-full h-2/3 gap-2">
-    {% for item in timer_data %}
-    <div class="flex flex-col-reverse items-start w-10 h-full gap-2 group">
-      <div class="w-full -mt-3 text-center text-sub-color">{{ item[0] }}</div>
-      <div class="w-full text-center text-sub-color">{{ item[1] }}</div>
-      <div class="w-full rounded-lg bg-sub-color group-hover:bg-main-color transition-colors duration-300" style="height: {{ item[2] * 100 / max_session_count }}%;"></div>
-      <div class="w-full text-center text-main-color transition-all duration-700 opacity-0 group-hover:opacity-100">{{ item[2] }}</div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
 {% endblock %}

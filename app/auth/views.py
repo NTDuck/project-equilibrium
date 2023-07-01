@@ -1,4 +1,5 @@
 
+from datetime import date
 from flask import render_template, redirect, url_for, request, abort
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -66,7 +67,7 @@ def register():
         password = request.form.get("password").strip()
 
         try:
-            user = User(email=email, username=username, password=password)
+            user = User(email=email, username=username, password=password, date_joined=date.today())
         except ValueError:
             abort(400)
         else:
