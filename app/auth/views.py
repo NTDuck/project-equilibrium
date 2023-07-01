@@ -6,7 +6,8 @@ from flask_login import login_user, logout_user, login_required, current_user
 from config import Config
 from . import auth
 from .. import db
-from ..models import User
+from ..models import User, TimerSessionCount
+from ..utils import current_streak, longest_streak
 from ..email import send_email
 
 
@@ -102,3 +103,42 @@ def resend_confirmation():
     token = current_user.generate_confirmation_token()
     send_email([getattr(current_user, "email")], "confirm your account", "auth/email/confirm", user=current_user, token=token, expiration=f"{Config.CONFIRMATION_TOKEN_EXPIRATION // 60} minutes")
     return redirect(url_for("main.index"))
+
+
+@auth.route("/profile")
+def profile():
+    timer_data = getattr(current_user, TimerSessionCount.__tablename__)
+    session_counts = [getattr(i, "session_count") for i in timer_data] if timer_data else []
+    data = {
+        "username": getattr(current_user, "username"),
+        "date_joined": getattr(current_user, "date_joined").strftime("joined %b %d %Y"),
+        "current_streak": current_streak(session_counts),
+        "longest_streak": longest_streak(session_counts),
+        "pomodoro_completed": sum(session_counts),
+        "max_session_count": max(session_counts) if timer_data else 1,
+        "session_count_chart_data": [[item.date.strftime("%b"), item.date.strftime("%d"), item.session_count] for item in timer_data],
+    }
+    return render_template("auth/profile.html", data=data)
+
+
+@auth.route("/password/update", methods=["GET", "POST"])
+def password_update():
+    if request.method == "POST":
+        old_password = request.form.get("old-password").strip()
+        new_password = request.form.get("new-password").strip()
+        if not current_user.verify_password(old_password):
+            redirect(url_for("auth.password_reset"))
+        try:
+            setattr(current_user, "password", new_password)
+        except ValueError:
+            abort(400)
+        else:
+            # flash something
+            db.session.commit()
+        return redirect(url_for("auth.profile"))
+    return render_template("auth/password-update.html")
+
+
+@auth.route("/password/reset")
+def password_reset():
+    ...

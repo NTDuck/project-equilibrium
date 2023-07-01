@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
+{% block title %}user {{ data.username }}{% endblock %}
+
 {% block content %}
 <div class="flex flex-col items-center justify-center gap-16 max-w-7xl h-full mx-auto p-8 first:py-0 last:py-0 overflow-y-auto scroll-smooth">
   <div class="flex flex-row items-center w-full h-36 rounded-lg bg-sub-alt-color gap-4 p-4">
     <div class="flex flex-row items-center justify-center flex-none gap-4 px-2 w-[16.4rem]">
       <img src="{{ url_for('static', filename='images/user/default.png') }}" class="w-20 h-20 rounded-full cursor-pointer">
-      <div class="flex flex-col justify-center items-center gap-1">
+      <div class="flex flex-col justify-start items-start gap-1">
         <div class="text-4xl tracking-tight leading-snug text-text-color">{{ data.username }}</div>
         <div class="text-xs tracking-tight leading-none text-sub-color">{{ data.date_joined }}</div>
         <div class="text-xs tracking-tight leading-none text-sub-color">current streak: {{ data.current_streak }} {% if data.current_streak == 1 %}day{% else %}days{% endif %}</div>
@@ -23,7 +25,18 @@
       </div>
     </div>
   </div>
-  <div class="flex overflow-x-scroll flex-row w-full h-80 gap-2 self-center">
+  <div class="flex flex-row items-center w-full h-36 rounded-lg bg-sub-alt-color gap-4 p-4">
+    <div class="flex flex-col items-center justify-center gap-4">
+      <p class="text-sm text-sub-color">password update</p>
+      <a href="{{ url_for('auth.password_update') }}" class="transition-colors duration-300 text-sub-color hover:text-text-color">
+        <svg class="w-4 h-4 ml-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <path d="M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zM376 96a40 40 0 1 1 0 80 40 40 0 1 1 0-80z"/>
+        </svg>
+      </a>
+    </div>
+    <div class="flex-none w-2 h-28 rounded-lg bg-bg-color"></div>
+  </div>
+  <div class="flex flex-none overflow-x-scroll flex-row w-full h-80 gap-2 self-center">
     {% for item in data.session_count_chart_data %}
     <div class="flex flex-col-reverse items-start w-10 h-full gap-2 group">
       <div class="w-full -mt-3 text-center text-sub-color">{{ item[0] }}</div>
