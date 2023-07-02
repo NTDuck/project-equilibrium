@@ -86,8 +86,6 @@ class User(UserMixin, db.Model):
         return encode({
             "time": datetime.utcnow().isoformat(),
             "id": self.id,
-            "email": self.email,
-            "username": self.username,
         }, key=Config.SECRET_KEY, algorithm=Config.CONFIRMATION_TOKEN_ALGORITHM)
 
     def validate_confirmation_token(self, token: str, expiration=Config.CONFIRMATION_TOKEN_EXPIRATION) -> bool:
@@ -98,13 +96,11 @@ class User(UserMixin, db.Model):
             return False
 
         # validate token
-        if credentials.keys() != {"time", "id", "email", "username"}:
+        if credentials.keys() != {"time", "id"}:
             return False
         
         time_generated = datetime.fromisoformat(credentials.get("time"))
         id = credentials.get("id")
-        email = credentials.get("email")
-        username = credentials.get("username")
 
         # check if token is expired
         time_now = datetime.utcnow()
@@ -112,11 +108,36 @@ class User(UserMixin, db.Model):
         if time_delta.seconds > expiration:
             return False
         
-        return all([
-            id == self.id,
-            email == self.email,
-            username == self.username,
-        ])
+        return id == self.id
+    
+    def generate_password_reset_token(self) -> str:
+        return encode({
+            "time": datetime.utcnow().isoformat(),
+            "id": self.id,
+        }, key=Config.SECRET_KEY, algorithm=Config.CONFIRMATION_TOKEN_ALGORITHM)
+    
+    @classmethod
+    def validate_password_reset_token(cls, token, expiration=Config.CONFIRMATION_TOKEN_EXPIRATION):   # return user if exists
+        # retrieve token
+        try:
+            credentials = decode(token, key=Config.SECRET_KEY, algorithms=Config.CONFIRMATION_TOKEN_ALGORITHM)
+        except:
+            return False
+
+        # validate token
+        if credentials.keys() != {"time", "id"}:
+            return False
+        
+        time_generated = datetime.fromisoformat(credentials.get("time"))
+        id = credentials.get("id")
+
+        # check if token is expired
+        time_now = datetime.utcnow()
+        time_delta = time_now - time_generated
+        if time_delta.seconds > expiration:
+            return False
+        
+        return db.session.execute(db.select(User).filter_by(id=id)).scalar_one()
 
 
 @login_manager.user_loader

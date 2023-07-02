@@ -10,6 +10,7 @@
     <div class="flex flex-row-reverse items-center justify-around">
       <button class="rounded-lg px-3 py-2 transition-colors bg-sub-color text-text-color hover:bg-sub-alt-color hover:text-main-color focus:bg-sub-alt-color focus:text-main-color" type="submit">login</button>
       <a href="{{ url_for('auth.register') }}" class="transition-colors hover:text-text-color focus:text-text-color">register</a>
+      <a href="{{ url_for('auth.password_reset_request') }}" class="transition-colors hover:text-text-color focus:text-text-color">forget?</a>
     </div>
   </form>
 </div>
