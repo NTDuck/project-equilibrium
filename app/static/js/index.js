@@ -1,5 +1,5 @@
 
-import { UtilsBarColorTransition, UtilsItemColorTransition, Timer, handleCopyContent, handleKeydownEvent, createUtilsItem, createChatbotServerMessage, handleUtilsItemUpdate, handleUtilsItemDeletion, handleChatbotServerMessageUpdate, handleChatbotUserMessageUpdate, handleChatbotUserMessageDeletion } from './utils.js';
+import { UtilsBarColorTransition, UtilsItemColorTransition, Timer, handleCopyContent, handleKeydownEvent, createUtilsItem, createChatbotServerMessage, handleUtilsItemUpdate, handleUtilsItemDelete, handleChatbotServerMessageUpdate, handleChatbotUserMessageUpdate, handleChatbotUserMessageDelete } from './utils.js';
 
 
 // prevent running jQuery code before finish loading document
@@ -67,7 +67,7 @@ $(document).ready(function() {
 
   // control color transition of items on "edit" toggle
   $(".utils-item:not(.no-custom-transition").each(function() {
-    const TodolistItemTransition = new UtilsItemColorTransition($(this), $(this).find("div.utils-item-content"), $(this).find("form.utils-item-edit-form"), $(this).find("button.utils-item-edit-button"));
+    const TodolistItemTransition = new UtilsItemColorTransition($(this), $(this).find("div.utils-item-content"), $(this).find("button.utils-item-update-button"));
   });
 
   // handle todolist insertion
@@ -80,23 +80,23 @@ $(document).ready(function() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        "todolist-item-add": $("#todolist-input-input").val(),
+        "todolist-create": $("#todolist-input-input").val(),
       }),
     })
       .then(response => response.json())
-      .then(todolistInsertValue => {
+      .then(data => {
         // clear form input after submission
-
-        var utilsItem = createUtilsItem(todolistInsertValue, "todolist-item-edit-form", "todolist-item-delete-form");
+        
+        var utilsItem = createUtilsItem(data["id"], data["value"]);
         $("#todolist-list").append(utilsItem);   // append to parent div as last element
         const utilsItemElem = $("#todolist-list").find(".utils-item:last");
 
         handleCopyContent(utilsItemElem.find(".utils-item-content"));   // copy content to clipboard
-        const utilsItemColorTransition = new UtilsItemColorTransition(utilsItemElem, utilsItemElem.find(".utils-item-content"), utilsItemElem.find("form.utils-item-edit-form"), utilsItemElem.find("button.utils-item-edit-button"));   // handle color transition
+        const utilsItemColorTransition = new UtilsItemColorTransition(utilsItemElem, utilsItemElem.find(".utils-item-content"), utilsItemElem.find("button.utils-item-update-button"));   // handle color transition
         
         // communication with backend
-        handleUtilsItemUpdate(utilsItemElem.find("form.todolist-item-edit-form"), "/api/todolist/update");
-        handleUtilsItemDeletion(utilsItemElem.find("form.todolist-item-delete-form"), "/api/todolist/delete");
+        handleUtilsItemUpdate(utilsItemElem.find("button.utils-item-update-button"), "/api/todolist/update");
+        handleUtilsItemDelete(utilsItemElem.find("button.utils-item-delete-button"), "/api/todolist/delete");
         // do something to scroll to bottom
       })
       .catch(error => {
@@ -105,13 +105,13 @@ $(document).ready(function() {
   });
 
   // handle todolist update
-  $("#todolist-list form.todolist-item-edit-form").each(function() {
+  $("#todolist-list button.utils-item-update-button").each(function() {
     handleUtilsItemUpdate($(this), "/api/todolist/update");
   });
 
   // handle todolist deletion
-  $("#todolist-list form.todolist-item-delete-form").each(function() {
-    handleUtilsItemDeletion($(this), "/api/todolist/delete");
+  $("#todolist-list button.utils-item-delete-button").each(function() {
+    handleUtilsItemDelete($(this), "/api/todolist/delete");
   });
 
   // control timer
@@ -133,17 +133,17 @@ $(document).ready(function() {
       }),
     })
       .then(response => response.json())
-      .then(chatbotUserMessage => {
-        var userMessage = createUtilsItem(chatbotUserMessage, "chatbot-user-msg-edit-form", "chatbot-user-msg-delete-form")
+      .then(data => {
+        var userMessage = createUtilsItem(data["id"], data["value"]);
         $("#chatbot-message-container").append(userMessage);
         const userMessageElem = $("#chatbot-message-container").find(".utils-item:last");
 
         handleCopyContent(userMessageElem.find(".utils-item-content"));   // copy content to clipboard
-        const utilsItemColorTransition = new UtilsItemColorTransition(userMessageElem, userMessageElem.find(".utils-item-content"), userMessageElem.find("form.utils-item-edit-form"), userMessageElem.find("button.utils-item-edit-button"));   // handle color transition
+        const utilsItemColorTransition = new UtilsItemColorTransition(userMessageElem, userMessageElem.find(".utils-item-content"), userMessageElem.find("button.utils-item-update-button"));   // handle color transition
 
         // communication with backend
-        handleChatbotUserMessageUpdate(userMessageElem.find("form.chatbot-user-msg-edit-form"), "/api/chatbot/user-msg/update");
-        handleChatbotUserMessageDeletion(userMessageElem.find("form.chatbot-user-msg-delete-form"), "/api/chatbot/user-msg/delete");
+        handleChatbotUserMessageUpdate(userMessageElem.find("button.utils-item-update-button"), "/api/chatbot/user-msg/update");
+        handleChatbotUserMessageDelete(userMessageElem.find("button.utils-item-delete-button"), "/api/chatbot/user-msg/delete");
 
         return fetch(chatbotApiRouteServerMessageCreate, {
           method: "POST",
@@ -155,13 +155,13 @@ $(document).ready(function() {
           }),
         })
           .then(response => response.json())
-          .then(chatbotServerMessage => {
-            var serverMessage = createChatbotServerMessage(chatbotServerMessage, "chatbot-server-msg-edit-form");
+          .then(data => {
+            var serverMessage = createChatbotServerMessage(data["id"], data["value"]);
             $("#chatbot-message-container").append(serverMessage);
             const serverMessageElem = $("#chatbot-message-container").find(".utils-item:last");
 
             handleCopyContent(serverMessageElem.find(".utils-item-content"));   // copy content to clipboard
-            handleChatbotServerMessageUpdate(serverMessageElem.find("form.chatbot-server-msg-edit-form"), "/api/chatbot/server-msg/update");
+            handleChatbotServerMessageUpdate(serverMessageElem.find("button.utils-item-update-button-server"), "/api/chatbot/server-msg/update");
           })
           .catch(error => {
             console.error(error);
@@ -170,17 +170,17 @@ $(document).ready(function() {
   })
 
   // handle chatbot user msg update
-  $("#chatbot-message-container form.chatbot-user-msg-edit-form").each(function() {
+  $("#chatbot-message-container button.utils-item-update-button").each(function() {
     handleChatbotUserMessageUpdate($(this), "/api/chatbot/user-msg/update");
   });
 
   // handle chatbot user msg deletion
-  $("#chatbot-message-container form.chatbot-user-msg-delete-form").each(function() {
-    handleChatbotUserMessageDeletion($(this), "/api/chatbot/user-msg/delete");
+  $("#chatbot-message-container button.utils-item-delete-button").each(function() {
+    handleChatbotUserMessageDelete($(this), "/api/chatbot/user-msg/delete");
   });
 
   // handle chatbot server msg update
-  $("#chatbot-message-container form.chatbot-server-msg-edit-form").each(function() {
+  $("#chatbot-message-container button.utils-item-update-button-server").each(function() {
     handleChatbotServerMessageUpdate($(this), "/api/chatbot/server-msg/update");
   });
 });

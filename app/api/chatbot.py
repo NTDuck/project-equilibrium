@@ -24,7 +24,10 @@ def create_user_message():
         else:
             db.session.add(item)
             db.session.commit()
-    return jsonify(value)
+    return jsonify({
+        "id": item.id if current_user.is_authenticated else 0,
+        "value": value,
+    })
 
 
 @api.post("/chatbot/user-msg/update/<phase>")
@@ -35,36 +38,39 @@ def edit_user_message(phase):
 
     # might try implementing a dict[str, method]
     if phase == "user":
-        if not "chatbot-user-msg-edit" in data:
+        if not "chatbot-user-msg-update" in data and not "id" in data:
             abort(400)
-        prev_value = data.get("chatbot-user-msg-edit-prev")
-        next_value = data.get("chatbot-user-msg-edit").strip()
+        user_msg_id = data.get("id")
+        user_msg_value = data.get("chatbot-user-msg-update").strip()
         if current_user.is_authenticated:
             try:
-                item = db.session.execute(db.select(ChatbotMessage).filter_by(user=current_user, value=prev_value)).scalar_one()
-                setattr(item, "value", next_value)
+                item = db.session.execute(db.select(ChatbotMessage).filter_by(user=current_user, id=user_msg_id)).scalar_one()
+                setattr(item, "value", user_msg_value)
                 db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= item.id + 2)))
             except ValueError:
                 abort(400)
             else:
                 db.session.commit()
-        return jsonify(next_value)
+        return jsonify({})
     
     elif phase == "server":
-        if not "chatbot-server-msg-edit" in data:
+        if not "chatbot-user-msg-last" in data and not "id" in data:
             abort(400)
-        last_user_msg_value = data.get("chatbot-last-user-msg")
-        prev_value = data.get("chatbot-server-msg-edit")
-        next_value = text_generation(last_user_msg_value)
+        server_msg_id = data.get("id")
+        user_msg_last_value = data.get("chatbot-user-msg-last")
+        server_msg_next_value = text_generation(user_msg_last_value)
+        print(server_msg_id, user_msg_last_value, server_msg_next_value)
         if current_user.is_authenticated:
             try:
-                item = db.session.execute(db.select(ChatbotMessage).filter_by(user=current_user, value=prev_value)).scalar_one()
-                setattr(item, "value", next_value)
+                item = db.session.execute(db.select(ChatbotMessage).filter_by(user=current_user, id=server_msg_id)).scalar_one()
+                setattr(item, "value", server_msg_next_value)
             except ValueError:
                 abort(400)
             else:
                 db.session.commit()
-        return jsonify(next_value)
+        return jsonify({
+            "value": server_msg_next_value,
+        })
     else:
         abort(400)
 
@@ -74,14 +80,14 @@ def delete_user_message():
     if not request.json:
         abort(400)
     data = request.get_json()
-    if not "chatbot-user-msg-delete" in data:
+    if not "id" in data:
         abort(400)
-    value = data.get("chatbot-user-msg-delete")
+    id = data.get("id")
     if current_user.is_authenticated:
-        item = db.session.execute(db.select(ChatbotMessage).filter_by(user=current_user, value=value)).scalar_one()
+        item = db.session.execute(db.select(ChatbotMessage).filter_by(user=current_user, id=id)).scalar_one()
         db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= item.id)))
         db.session.commit()
-    return jsonify(value)
+    return jsonify({})
 
 
 @api.post("/chatbot/server-msg/create")
@@ -92,16 +98,19 @@ def create_server_message():
     if not "chatbot-server-msg-create" in data:
         abort(400)
     value = data.get("chatbot-server-msg-create").strip()
-    server_response = text_generation(value)
+    server_msg_value = text_generation(value)
     if current_user.is_authenticated:
         try:
-            item = ChatbotMessage(user=current_user, value=server_response, type="server")
+            item = ChatbotMessage(user=current_user, value=server_msg_value, type="server")
         except ValueError:
             abort(400)
         else:
             db.session.add(item)
             db.session.commit()
-    return jsonify(server_response)
+    return jsonify({
+        "id": item.id,
+        "value": server_msg_value,
+    })
 
 
 @api.post("/chatbot/server-msg/update")
@@ -109,22 +118,23 @@ def update_server_message():
     if not request.json:
         abort(400)
     data = request.get_json()
-    if not "chatbot-server-msg-update" in data:
+    if not "id" in data or not "chatbot-user-msg-last" in data:
         abort(400)
     # also delete all messages after
-    prev_value = data.get("chatbot-server-msg-update")
+    id = data.get("id")
     if current_user.is_authenticated:
-        item = db.session.execute(db.select(ChatbotMessage).filter_by(user=current_user, value=prev_value)).scalar_one()
+        item = db.session.execute(db.select(ChatbotMessage).filter_by(user=current_user, id=id)).scalar_one()
         db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= item.id + 1)))
 
-    last_user_msg_value = data.get("chatbot-last-user-msg")
-    next_value = text_generation(last_user_msg_value)
+    user_msg_last_value = data.get("chatbot-user-msg-last")
+    server_msg_next_value = text_generation(user_msg_last_value)
     if current_user.is_authenticated:
         try:
-            item = db.session.execute(db.select(ChatbotMessage).filter_by(user=current_user, value=prev_value)).scalar_one()
-            setattr(item, "value", next_value)
+            setattr(item, "value", server_msg_next_value)
         except ValueError:
             abort(400)
         else:
             db.session.commit()
-    return jsonify(next_value)
+    return jsonify({
+        "value": server_msg_next_value,
+    })

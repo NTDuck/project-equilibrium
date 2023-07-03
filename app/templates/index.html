@@ -8,7 +8,7 @@
     {{ utilsBar(formId="todolist-search-form", outerDivId="todolist-search-outerDiv", inputId="todolist-search-input", buttonId="todolist-search-button", svgName="magnifying-glass") }}
     <div id="todolist-list" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y rounded-lg">
       {% for item in todolistItems %}
-      {{ utilsItem(content=item.value, formClassEdit="todolist-item-edit-form", formClassDelete="todolist-item-delete-form") }}
+      {{ utilsItem(id=item.id, value=item.value) }}
       {% endfor %}
     </div>
     <div class="flex flex-col flex-none items-center justify-center w-full h-20 rounded-lg bg-sub-alt-color text-main-color">
@@ -42,9 +42,9 @@
     <div id="chatbot-message-container" class="flex flex-col flex-grow justify-start w-full h-0 gap-2 overflow-y-auto scroll-smooth snap-mandatory snap-always snap-y rounded-lg">
       {% for item in chatbotMessages %}
       {% if item.type == "user" %}
-      {{ utilsItem(content=item.value, formClassEdit="chatbot-user-msg-edit-form", formClassDelete="chatbot-user-msg-delete-form") }}
+      {{ utilsItem(id=item.id, value=item.value) }}
       {% else %}
-      {{ chatbotServerMsg(content=item.value, formClassEdit="chatbot-server-msg-edit-form") }}
+      {{ chatbotServerMsg(id=item.id, value=item.value) }}
       {% endif %}
       {% endfor %}
     </div>

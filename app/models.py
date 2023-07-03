@@ -157,7 +157,7 @@ class Todolist(Base, db.Model):
     
     @value.setter
     def value(self, value: str):
-        if not super().validate(value=value, attr="value"):
+        if not super().validate(value=value, attr="value", unique=False):
             raise ValueError
         self._value = value
 
@@ -206,7 +206,7 @@ class ChatbotMessage(Base, db.Model):
     
     @value.setter
     def value(self, value: str):
-        if not super().validate(value=value, attr="value", max_str_length=512):
+        if not super().validate(value=value, attr="value", max_str_length=512, unique=False):
             raise ValueError
         self._value = value
 

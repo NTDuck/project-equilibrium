@@ -61,42 +61,34 @@
 {% endmacro %}
 
 
-{% macro utilsItem(formClassEdit, formClassDelete, content="") %}
-<div class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 utils-item">
-  <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color text-sm utils-item-content">{{ content|e }}</div>
+{% macro utilsItem(id="", value="") %}
+<div id="utils-item-{{ id }}" class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 utils-item">
+  <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color text-sm utils-item-content">{{ value|e }}</div>
   <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-500">
-    <form method="post" class="select-none utils-item-edit-form {{ formClassEdit }}">
-      <input class="utils-item-edit-input" type="hidden" value="{{ content|e }}" autocomplete="off">
-      <button type="button" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color utils-item-edit-button">
-        <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['pen-to-square_'].dimension }}">
-          {{ ICONS['pen-to-square_'].path|safe }}
+    <button type="button" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color utils-item-update-button">
+      <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['pen-to-square_'].dimension }}">
+        {{ ICONS['pen-to-square_'].path|safe }}
         </svg>
       </button>
-    </form>
-    <form method="post" class="select-none {{ formClassDelete }}">
-      <input class="utils-item-delete-input" type="hidden" value="{{ content|e }}" autocomplete="off">
-      <button type="submit" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color">
-        <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['trash-can_'].dimension }}">
-          {{ ICONS['trash-can_'].path|safe }}
-        </svg>
-      </button>
-    </form>
+    <button type="submit" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color utils-item-delete-button">
+      <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['trash-can_'].dimension }}">
+        {{ ICONS['trash-can_'].path|safe }}
+      </svg>
+    </button>
   </div>
 </div>
 {% endmacro %}
 
 
-{% macro chatbotServerMsg(formClassEdit, content="") %}
-<div class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 utils-item no-custom-transition">
-  <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color text-sm utils-item-content">{{ content|e }}</div>
+{% macro chatbotServerMsg(id, value) %}
+<div id="utils-item-{{ id }}" class="flex flex-row items-center py-2 px-4 max-w-full h-fit bg-sub-alt-color rounded-lg group snap-start transition-colors duration-300 utils-item no-custom-transition">
+  <div class="flex-grow line-clamp-[99] transition-all duration-300 text-sub-color hover:text-text-color focus:text-text-color cursor-pointer caret-caret-color text-sm utils-item-content">{{ value|e }}</div>
   <div class="flex flex-col flex-none justify-between pb-[1%] text-sub-color opacity-0 group-hover:opacity-100 transition-all duration-500">
-    <form method="post" class="select-none utils-item-edit-form {{ formClassEdit }}">
-      <button type="submit" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color utils-item-edit-button">
-        <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['rotate'].dimension }}">
-          {{ ICONS['rotate'].path|safe }}
-        </svg>
-      </button>
-    </form>
+    <button type="submit" class="transition-colors duration-300 fill-current text-sub-color hover:text-text-color focus:text-text-color utils-item-update-button-server">
+      <svg class="fill-inherit inline-block w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ ICONS['rotate'].dimension }}">
+        {{ ICONS['rotate'].path|safe }}
+      </svg>
+    </button>
   </div>
 </div>
 {% endmacro %}

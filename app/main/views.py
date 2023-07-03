@@ -14,8 +14,8 @@ def index():
         chatbotMessages = getattr(current_user, ChatbotMessage.__tablename__)
     else:
         # implement some example messages
-        todolistItems = [{"value": i} for i in Config.TODOLIST_EXAMPLE_MESSAGES]
-        chatbotMessages = [{"value": i, "type": "user" if Config.CHATBOT_EXAMPLE_MESSAGES.index(i)%2 == 0 else "server"} for i in Config.CHATBOT_EXAMPLE_MESSAGES]
+        todolistItems = [{"id": ind, "value": val} for ind, val in enumerate(Config.TODOLIST_EXAMPLE_MESSAGES)]
+        chatbotMessages = [{"id": ind, "value": val, "type": "user" if ind%2 == 0 else "server"} for ind, val in enumerate(Config.CHATBOT_EXAMPLE_MESSAGES)]
     return render_template("index.html", todolistItems=todolistItems, chatbotMessages=chatbotMessages)
 
 

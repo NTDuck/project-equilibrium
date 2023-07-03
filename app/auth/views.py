@@ -171,12 +171,3 @@ def password_reset_confirm(token):
             return redirect(url_for("auth.login"))
     session["password_reset_token"] = token   # store to session
     return render_template("auth/password-reset.html", token=token)
-
-
-"""
-passsword reset:
-1. user click on link
-2. generate email, send link to user | presq: user.email
-3. email contain link, when clicked redirect to password-reset.html
-4. validate -> reset successfully.
-"""
