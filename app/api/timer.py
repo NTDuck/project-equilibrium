@@ -1,7 +1,7 @@
 
 import os
 from datetime import date
-from flask import jsonify, request, abort
+from flask import jsonify, request, abort, session
 from flask_login import current_user, login_required
 
 from config import Config
@@ -30,12 +30,17 @@ def get_timer_gifs(folder):
 
 @api.post("/timer/session-count/update")
 def update_timer_session_count():
+    if "is_timer_ready" not in session:
+        session["is_timer_ready"] = True
     if not request.is_json:
         abort(400)
     if not "session-count" in request.json:
         abort(400)
     if current_user.is_authenticated:
-        item = db.session.execute(db.select(TimerSessionCount).filter_by(user=current_user, date=date.today())).scalar_one()
+        if not session["is_timer_ready"]:
+            abort(400)
+        session["is_timer_ready"] = False
+        item = db.session.execute(db.select(TimerSessionCount).where(db.and_(TimerSessionCount.user == current_user, TimerSessionCount.date == date.today()))).scalar_one()
         try:
             if item is not None:   # query already exists
                 item.session_count += 1
@@ -46,6 +51,7 @@ def update_timer_session_count():
             abort(400)
         else:
             db.session.commit()
+            session["is_timer_ready"] = True
 
 
 @api.get("/timer/session-count/get")

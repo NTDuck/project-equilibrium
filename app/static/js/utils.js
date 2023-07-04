@@ -63,6 +63,7 @@ export class UtilsItemColorTransition {
     if (isEditable) {
       this.contentDiv.attr("contenteditable", "false");
       this.button.attr("type", "submit");
+      this.button.blur();
     } else {
       this.contentDiv.attr("contenteditable", "true");
       this.button.attr("type", "button");
@@ -73,15 +74,15 @@ export class UtilsItemColorTransition {
   }
 
   updateStyles(isEditable) {
-    if (isEditable) {
-      this.outerDiv.removeClass("bg-sub-alt-color").addClass("bg-sub-color");
-      this.contentDiv.removeClass("text-sub-color hover:text-text-color focus:text-text-color").addClass("text-main-color focus:text-text-color");
-      this.button.addClass("text-text-color focus:text-main-color").removeClass("text-sub-color hover:text-text-color focus:text-text-color");
-    } else {
-      this.outerDiv.removeClass("bg-sub-color").addClass("bg-sub-alt-color");
-      this.contentDiv.removeClass("text-main-color focus:text-text-color").addClass("text-sub-color hover:text-text-color focus:text-text-color");
-      this.button.removeClass("text-text-color focus:text-main-color").addClass("text-sub-color hover:text-text-color focus:text-text-color");
-    }
+    // if (isEditable) {
+    //   this.outerDiv.removeClass("bg-sub-alt-color").addClass("bg-sub-color");
+    //   this.contentDiv.removeClass("text-sub-color hover:text-text-color focus:text-text-color").addClass("text-main-color focus:text-text-color");
+    //   this.button.addClass("text-text-color focus:text-main-color").removeClass("text-sub-color hover:text-text-color focus:text-text-color");
+    // } else {
+    //   this.outerDiv.removeClass("bg-sub-color").addClass("bg-sub-alt-color");
+    //   this.contentDiv.removeClass("text-main-color focus:text-text-color").addClass("text-sub-color hover:text-text-color focus:text-text-color");
+    //   this.button.removeClass("text-text-color focus:text-main-color").addClass("text-sub-color hover:text-text-color focus:text-text-color");
+    // }
   }
 
   setCaretToEnd(element) {
@@ -97,20 +98,20 @@ export class UtilsItemColorTransition {
     const isEditable = this.contentDiv.attr("contenteditable") === "true";
     const isTabKey = event.key === "Tab";
     if (isEditable && !isTabKey) {
-      this.outerDiv.removeClass("bg-sub-color").addClass("bg-sub-alt-color");
+      // this.outerDiv.removeClass("bg-sub-color").addClass("bg-sub-alt-color");
       this.contentDiv.on("focus", this.handleContentDivFocus.bind(this));
     } else {
-      this.outerDiv.removeClass("bg-sub-alt-color").addClass("bg-sub-color");
+      // this.outerDiv.removeClass("bg-sub-alt-color").addClass("bg-sub-color");
     }
   }
 
   handleContentDivFocus() {
     const isEditable = this.contentDiv.attr("contenteditable") === "true";
     if (isEditable) {
-      this.outerDiv.removeClass("bg-sub-alt-color").addClass("bg-sub-color");
+      // this.outerDiv.removeClass("bg-sub-alt-color").addClass("bg-sub-color");
       this.contentDiv.on("focus", this.handleContentDivFocus.bind(this));
     } else {
-      this.outerDiv.removeClass("bg-sub-alt-color").addClass("bg-sub-color");
+      // this.outerDiv.removeClass("bg-sub-alt-color").addClass("bg-sub-color");
     }
   }
 
