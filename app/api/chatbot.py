@@ -56,7 +56,9 @@ def edit_user_message(phase):
         user_msg_value = data.get("chatbot-user-msg-update").strip()
         if current_user.is_authenticated:
             try:
-                item = db.session.execute(db.select(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id == user_msg_id))).scalar_one()
+                item = db.session.execute(db.select(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id == user_msg_id))).scalar_one_or_none()
+                if item is None:
+                    abort(400)
                 setattr(item, "value", user_msg_value)
                 db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= item.id + 2)))
             except ValueError:
@@ -74,7 +76,9 @@ def edit_user_message(phase):
         print(server_msg_id, user_msg_last_value, server_msg_next_value)
         if current_user.is_authenticated:
             try:
-                item = db.session.execute(db.select(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id == server_msg_id))).scalar_one()
+                item = db.session.execute(db.select(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id == server_msg_id))).scalar_one_or_none()
+                if item is None:
+                    abort(400)
                 setattr(item, "value", server_msg_next_value)
             except ValueError:
                 abort(400)
@@ -143,7 +147,9 @@ def update_server_message():
     # also delete all messages after
     id = data.get("id")
     if current_user.is_authenticated:
-        item = db.session.execute(db.select(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id == id))).scalar_one()
+        item = db.session.execute(db.select(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id == id))).scalar_one_or_none()
+        if item is None:
+            abort(400)
         db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= item.id + 1)))
 
     user_msg_last_value = data.get("chatbot-user-msg-last")

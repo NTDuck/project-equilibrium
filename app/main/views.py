@@ -4,14 +4,15 @@ from flask_login import current_user, login_required
 
 from config import Config
 from . import main
+from .. import db
 from ..models import Todolist, ChatbotMessage
 
 
 @main.route("/")
 def index():
     if current_user.is_authenticated:
-        todolistItems = getattr(current_user, Todolist.__tablename__)
-        chatbotMessages = getattr(current_user, ChatbotMessage.__tablename__)
+        todolistItems = db.session.execute(db.select(Todolist).where(Todolist.user == current_user)).scalars().all()
+        chatbotMessages = db.session.execute(db.select(ChatbotMessage).where(ChatbotMessage.user == current_user)).scalars().all()
     else:
         # implement some example messages
         todolistItems = [{"id": ind, "value": val} for ind, val in enumerate(Config.TODOLIST_EXAMPLE_MESSAGES)]

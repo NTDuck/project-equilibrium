@@ -53,7 +53,9 @@ def update_todolist_item():
             abort(418)
         session["is_todolist_ready"] = False
         try:
-            item = db.session.execute(db.select(Todolist).where(db.and_(Todolist.user == current_user, Todolist.id == id))).scalar_one()
+            item = db.session.execute(db.select(Todolist).where(db.and_(Todolist.user == current_user, Todolist.id == id))).scalar_one_or_none()
+            if item is None:   # practically cannot occur
+                abort(400)
             setattr(item, "value", value)
         except ValueError:
             return abort(400)

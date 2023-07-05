@@ -40,10 +40,12 @@ def update_timer_session_count():
         if not session["is_timer_ready"]:
             abort(400)
         session["is_timer_ready"] = False
-        item = db.session.execute(db.select(TimerSessionCount).where(db.and_(TimerSessionCount.user == current_user, TimerSessionCount.date == date.today()))).scalar_one()
+        item = db.session.execute(db.select(TimerSessionCount).where(db.and_(TimerSessionCount.user == current_user, TimerSessionCount.date == date.today()))).scalar_one_or_none()
         try:
             if item is not None:   # query already exists
-                item.session_count += 1
+                session_count = getattr(item, "session_count")
+                session_count += 1
+                setattr(item, "session_count", session_count)
             else:   # non-existent query
                 item = TimerSessionCount(user=current_user, date=date.today(), session_count=1)
                 db.session.add(item)
@@ -52,6 +54,7 @@ def update_timer_session_count():
         else:
             db.session.commit()
             session["is_timer_ready"] = True
+    return jsonify({})
 
 
 @api.get("/timer/session-count/get")

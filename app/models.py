@@ -14,6 +14,7 @@ from . import db, login_manager
 
 class Base:
     __abstract__ = True
+
     @classmethod
     def validate(cls, value: str, attr, min_str_length=Config.USER_INPUT_MIN_STRING_LENGTH, max_str_length=Config.USER_INPUT_MAX_STRING_LENGTH, unique=True):
         return all([
@@ -22,6 +23,16 @@ class Base:
             not value.isspace(),
             not unique or cls.query.filter_by(user=current_user, **{attr: value}).first() is None,
         ])
+    
+    """
+    sqlalchemy.engine.row.Row -> db.Model
+    only necessary if fetch() is used instead of scalars()
+    """
+    # @classmethod
+    # def row_to_model(cls, r):
+    #     if not isinstance(r, list):
+    #         return r._asdict()[cls.__name__]
+    #     return [cls.row_to_model(i) for i in r]
 
 
 class User(UserMixin, db.Model):
