@@ -12,6 +12,7 @@ from ..models import Todolist, ChatbotMessage
 def index():
     if current_user.is_authenticated:
         todolistItems = db.session.execute(db.select(Todolist).where(Todolist.user == current_user)).scalars().all()
+        # if last msg is user-type, delete it
         chatbotMessages = db.session.execute(db.select(ChatbotMessage).where(ChatbotMessage.user == current_user)).scalars().all()
     else:
         # implement some example messages

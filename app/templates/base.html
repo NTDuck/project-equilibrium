@@ -78,9 +78,25 @@
     </div>
   </footer>
 
+  <div id="flash-message-container" class="flex flex-col-reverse justify-end gap-4 absolute w-80 top-10 right-[5%] bg-slate-400">
+    {% for message in get_flashed_messages() %}
+    <button class="w-full outline outline-main-color outline-4 bg-sub-alt-color rounded-lg px-4 py-2 group flash-message">
+      <div class="absolute h-full opacity-0 group-hover:opacity-100 text-main-color">
+        <svg class="fill-current inline-block h-3/4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+          <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+        </svg>
+      </div>
+      <div class="opacity-100 group-hover:opacity-20 text-start">
+        <p class="text-xs">message</p>
+        <p class="text-text-color">{{ message }}</p>
+      </div>
+    </button>
+    {% endfor %}
+  </div>
+
   {% block scripts %}
   <!-- {{ moment.include_moment() }} -->
-  <script src="{{ url_for('static', filename='js/vendor/jquery-3.7.0.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/vendors/jquery-3.7.0.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   {% endblock scripts %}
 </body>

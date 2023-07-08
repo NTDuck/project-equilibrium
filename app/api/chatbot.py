@@ -25,11 +25,17 @@ def create_user_message():
     if current_user.is_authenticated:
         try:
             if not session["is_chatbot_ready"]:
-                abort(400)
+                return jsonify({
+                    "error": 418,
+                    "flash": "please wait a few seconds.",
+                })
             session["is_chatbot_ready"] = False
             item = ChatbotMessage(user=current_user, value=value, type="user")
         except ValueError:
-            abort(400)
+            return jsonify({
+                "error": 400,
+                "flash": "item invalid. please try again.",
+            })
         else:
             db.session.add(item)
             db.session.commit()
@@ -48,7 +54,10 @@ def edit_user_message(phase):
     # might try implementing a dict[str, method]
     if phase == "user":
         if not session["is_chatbot_ready"]:
-            abort(400)
+            return jsonify({
+                "error": 418,
+                "flash": "please wait a few seconds.",
+            })
         session["is_chatbot_ready"] = False
         if not "chatbot-user-msg-update" in data and not "id" in data:
             abort(400)
@@ -62,7 +71,10 @@ def edit_user_message(phase):
                 setattr(item, "value", user_msg_value)
                 db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= item.id + 2)))
             except ValueError:
-                abort(400)
+                return jsonify({
+                    "error": 400,
+                    "flash": "item invalid. please try again.",
+                })
             else:
                 db.session.commit()
         return jsonify({})
@@ -81,7 +93,10 @@ def edit_user_message(phase):
                     abort(400)
                 setattr(item, "value", server_msg_next_value)
             except ValueError:
-                abort(400)
+                return jsonify({
+                    "error": 400,
+                    "flash": "item invalid. please try again.",
+                })
             else:
                 db.session.commit()
                 session["is_chatbot_ready"] = True
@@ -102,7 +117,10 @@ def delete_user_message():
     id = data.get("id")
     if current_user.is_authenticated:
         if not session["is_chatbot_ready"]:
-            abort(400)
+            return jsonify({
+                "error": 418,
+                "flash": "please wait a few seconds.",
+            })
         session["is_chatbot_ready"] = False
         db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= id)))
         db.session.commit()
@@ -123,7 +141,10 @@ def create_server_message():
         try:
             item = ChatbotMessage(user=current_user, value=server_msg_value, type="server")
         except ValueError:
-            abort(400)
+            return jsonify({
+                "error": 400,
+                "flash": "item invalid. please try again.",
+            })
         else:
             db.session.add(item)
             db.session.commit()
@@ -137,7 +158,10 @@ def create_server_message():
 @api.post("/chatbot/server-msg/update")
 def update_server_message():
     if not session["is_chatbot_ready"]:
-        abort(400)
+        return jsonify({
+            "error": 418,
+            "flash": "please wait a few seconds.",
+        })
     session["is_chatbot_ready"] = False
     if not request.json:
         abort(400)
@@ -149,7 +173,10 @@ def update_server_message():
     if current_user.is_authenticated:
         item = db.session.execute(db.select(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id == id))).scalar_one_or_none()
         if item is None:
-            abort(400)
+            return jsonify({
+                "error": 400,
+                "flash": "item invalid. please try again.",
+            })
         db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= item.id + 1)))
 
     user_msg_last_value = data.get("chatbot-user-msg-last")
@@ -158,7 +185,10 @@ def update_server_message():
         try:
             setattr(item, "value", server_msg_next_value)
         except ValueError:
-            abort(400)
+            return jsonify({
+                "error": 400,
+                "flash": "item invalid. please try again.",
+            })
         else:
             db.session.commit()
             session["is_chatbot_ready"] = True

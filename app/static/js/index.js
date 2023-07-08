@@ -1,5 +1,5 @@
 
-import { UtilsBarColorTransition, UtilsItemColorTransition, Timer, handleCopyContent, handleKeydownEvent, createUtilsItem, createChatbotServerMessage, handleUtilsItemUpdate, handleUtilsItemDelete, handleChatbotServerMessageUpdate, handleChatbotUserMessageUpdate, handleChatbotUserMessageDelete } from './utils.js';
+import { UtilsBarColorTransition, UtilsItemColorTransition, Timer, handleCopyContent, handleFlashMessage, handleKeydownEvent, createUtilsItem, createChatbotServerMessage, handleUtilsItemUpdate, handleUtilsItemDelete, handleChatbotServerMessageUpdate, handleChatbotUserMessageUpdate, handleChatbotUserMessageDelete } from './utils.js';
 
 
 // prevent running jQuery code before finish loading document
@@ -84,6 +84,7 @@ $(document).ready(function() {
       }),
     })
       .then(response => response.json())
+      .then(handleFlashMessage)
       .then(data => {
         // clear form input after submission
         
@@ -133,6 +134,7 @@ $(document).ready(function() {
       }),
     })
       .then(response => response.json())
+      .then(handleFlashMessage)
       .then(data => {
         var userMessage = createUtilsItem(data["id"], data["value"]);
         $("#chatbot-message-container").append(userMessage);
@@ -155,6 +157,7 @@ $(document).ready(function() {
           }),
         })
           .then(response => response.json())
+          .then(handleFlashMessage)
           .then(data => {
             var serverMessage = createChatbotServerMessage(data["id"], data["value"]);
             $("#chatbot-message-container").append(serverMessage);

@@ -23,12 +23,18 @@ def create_todolist_item():
     value = data.get("todolist-create").strip()
     if current_user.is_authenticated:
         if not session["is_todolist_ready"]:
-            abort(418)
+            return jsonify({
+                "error": 418,
+                "flash": "please wait a few seconds.",
+            })
         session["is_todolist_ready"] = False
         try:
             item = Todolist(user=current_user, value=value)
         except ValueError:
-            abort(400)
+            return jsonify({
+                "error": 400,
+                "flash": "item invalid. please try again.",
+            })
         else:
             db.session.add(item)
             db.session.commit()
@@ -50,7 +56,10 @@ def update_todolist_item():
     value = data.get("todolist-update").strip()
     if current_user.is_authenticated:
         if not session["is_todolist_ready"]:
-            abort(418)
+            return jsonify({
+                "error": 418,
+                "flash": "please wait a few seconds.",
+            })
         session["is_todolist_ready"] = False
         try:
             item = db.session.execute(db.select(Todolist).where(db.and_(Todolist.user == current_user, Todolist.id == id))).scalar_one_or_none()
@@ -58,7 +67,10 @@ def update_todolist_item():
                 abort(400)
             setattr(item, "value", value)
         except ValueError:
-            return abort(400)
+            return jsonify({
+                "error": 400,
+                "flash": "item invalid. please try again.",
+            })
         else:
             db.session.commit()
             session["is_todolist_ready"] = True
@@ -74,7 +86,10 @@ def delete_todolist_item():
         abort(400)
     if current_user.is_authenticated:
         if not session["is_todolist_ready"]:
-            abort(418)
+            return jsonify({
+                "error": 418,
+                "flash": "please wait a few seconds.",
+            })
         session["is_todolist_ready"] = False
         db.session.execute(db.delete(Todolist).where(db.and_(Todolist.user == current_user, Todolist.id == data.get("id"))))
         db.session.commit()

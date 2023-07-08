@@ -34,7 +34,7 @@ def login():
     if request.method == "POST":
         email = request.form.get("email").strip()
         password = request.form.get("password").strip()
-        user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one()
+        user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
         # will implement real things later, abort for now
         if user is None:
             # redirect to register page / flash msg
@@ -140,7 +140,7 @@ def password_reset_request():
     if request.method == "POST":
         email = request.form.get("email").strip()
         try:
-            user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one()
+            user = db.session.execute(db.select(User).where(User.email == email)).scalar_one()
         except:
             return abort(400)
         if user is None:
