@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from config import Config
 from . import main
 from .. import db
-from ..models import Todolist, ChatbotMessage
+from ..models import User, Todolist, TimerSessionCount, ChatbotMessage
 
 
 @main.route("/")
@@ -24,7 +24,11 @@ def index():
 # should be universal regardless of user login state
 @main.route("/about")
 def about():
-    return render_template("views/about.html")
+    data = {
+        "total_users": len(db.session.execute(db.select(User)).scalars().all()),
+        "total_pomodoros": sum([getattr(i, "session_count") for i in db.session.execute(db.select(TimerSessionCount)).scalars().all()]),
+    }
+    return render_template("views/about.html", data=data)
 
 
 @main.route("/stats")

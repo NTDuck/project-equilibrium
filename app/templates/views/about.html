@@ -1,4 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="flex flex-col items-center gap-4 max-w-7xl h-full mx-auto p-8 first:py-0 last:py-0 overflow-y-auto scroll-smooth">
+  <div class="text-center leading-5">
+    <p>created with a lot of coffee by duck.</p>
+    <p>supported by none.</p>
+    <p>not yet launched, still hosted locally.</p>
+  </div>
+  <div class="flex flex-row items-center w-full h-36 rounded-lg gap-4 p-4">
+    <div class="flex-none w-2 h-28 rounded-lg bg-bg-color"></div>
+    <div class="flex flex-row w-full items-center justify-around gap-8">
+      <div class="flex flex-col">
+        <div class="text-sm text-sub-color">total users</div>
+        <div class="text-4xl text-text-color">{{ data.total_users }}</div>
+      </div>
+      <div class="flex flex-col">
+        <div class="text-sm text-sub-color">total completed pomodoros</div>
+        <div class="text-4xl text-text-color">{{ data.total_pomodoros }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="self-start space-y-4 text-text-color">
+    <div>
+      <h2 class="text-3xl text-sub-color">features</h2>
+    </div>
+    <div>
+      <h2 class="text-sub-color">todolist</h2>
+      <p>a little something you'd expect. you can add, edit, or delete tasks however you like. just don't spam clicking too much - the server won't be happy.</p>
+    </div>
+    <div>
+      <h2 class="text-sub-color">neco-arc</h2>
+      <p>yes, <i>the creature in question</i> can be seen quite clearly in the middle. neco-arc will help you with your pomodoro sessions. which is weird.</p>
+    </div>
+    <div>
+      <h2 class="text-sub-color">chatbot</h2>
+      <p>chatgpt is too tired it degraded itself into whatever this is. it's not very smart and will often produce meaningless results. determinism is still retained anyway.</p>
+    </div>
+    <div>
+      <h2 class="text-sub-color">authentication</h2>
+      <p>makes your experience more enjoyable. supports user login, registration, password update, password reset. will support oauth2.0 in the future, if the devs have enough coffee. (technically "dev" since there's only one person maintaining it)</p>
+    </div>
+    <div>
+      <h2 class="text-sub-color">serika dark</h2>
+      <p>the color scheme is just so nice i decided to steal it. all hail <a href="https://github.com/monkeytypegame/monkeytype/blob/16c956c62c241deb9c3ffd0f3b3647625df4156e/frontend/static/themes/serika_dark.css">monkeytype</a>.</p>
+    </div>
+    <div>
+      <h2 class="text-3xl text-sub-color">about</h2>
+      <p>project-equilibrium</p>
+      <p>a minimal workspace.</p>
+    </div>
+    <div>
+      <h2 class="text-sub-color">bug report or feature request</h2>
+      <p>if you encounter a bug, or have a feature request - send me an email, a direct message on messenger or create an issue on gitHub.</p>
+    </div>
+  </div>
+</div>
 {% endblock %}
