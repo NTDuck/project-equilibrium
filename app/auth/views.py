@@ -1,6 +1,6 @@
 
 from datetime import date
-from flask import render_template, redirect, url_for, request, session, abort
+from flask import render_template, redirect, url_for, request, session, abort, flash
 from flask_login import login_user, logout_user, login_required, current_user
 
 from config import Config
@@ -35,16 +35,15 @@ def login():
         email = request.form.get("email").strip()
         password = request.form.get("password").strip()
         user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
-        # will implement real things later, abort for now
         if user is None:
-            # redirect to register page / flash msg
+            flash("user does not exist, please register instead.")
             return redirect(url_for("auth.register"))
         if not user.verify_password(password):
-            # false credentials
+            flash("false credentials.")
             return redirect(url_for("auth.login"))
         # if everything is okay
         login_user(user)
-        # will actually return the previous page user is in
+        flash("logged in successfully.")
         return redirect(url_for("main.index"))
     return render_template("auth/login.html")
 
@@ -53,7 +52,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    # notify user via flash msg
+    flash("logged out successfully.")
     return redirect(url_for("main.index"))
 
 
@@ -72,6 +71,7 @@ def register():
             db.session.commit()
         token = user.generate_confirmation_token()
         send_email([getattr(user, "email")], "confirm your account", "auth/email/confirm", user=user, token=token, expiration=f"{Config.CONFIRMATION_TOKEN_EXPIRATION // 60} minutes")
+        flash("registered successfully.")
         return redirect(url_for("auth.login"))
     return render_template("auth/register.html")
 
@@ -84,10 +84,9 @@ def confirm(token):
     if current_user.validate_confirmation_token(token):
         setattr(current_user, "confirmed", True)
         db.session.commit()
-        # flash msg
+        flash("token confirmed successfully.")
     else:
-        ...
-        # flash msg: token expired/invalid
+        flash("token invalid. please try again.")
     return redirect(url_for("main.index"))
 
 
@@ -127,9 +126,10 @@ def password_update():
         try:
             setattr(current_user, "password", new_password)
         except ValueError:
+            flash("password invalid. please try again.")
             return redirect(url_for("auth.password_update"))
         else:
-            # flash something
+            flash("password updated successfully.")
             db.session.commit()
         return redirect(url_for("auth.profile"))
     return render_template("auth/password-update.html")
@@ -142,9 +142,9 @@ def password_reset_request():
         try:
             user = db.session.execute(db.select(User).where(User.email == email)).scalar_one()
         except:
-            return abort(400)
+            return abort(400)   # ?
         if user is None:
-            # flash msg: user not exist, register instead
+            flash("user does not exist, please register instead.")
             return redirect(url_for("auth.register"))
         token = user.generate_password_reset_token()
         send_email([getattr(user, "email")], "password reset", "auth/email/password-reset", user=user, token=token, expiration=f"{Config.CONFIRMATION_TOKEN_EXPIRATION // 60} minutes")
@@ -158,16 +158,17 @@ def password_reset_confirm(token):
         new_password = request.form.get("password").strip()
         user = User.validate_password_reset_token(token=token)
         if not user:
-            # flash msg: token expired/invalid
+            flash("token invalid. please try again.")
             abort(400)
         try:
             setattr(user, "password", new_password)
         except ValueError:
-            # flash msg: password invalid
+            flash("password invalid. please try again.")
             abort(400)
         else:
             db.session.commit()
             session.pop("password_reset_token", None)   # remove from session if exists
+            flash("password reset successfully.")
             return redirect(url_for("auth.login"))
     session["password_reset_token"] = token   # store to session
     return render_template("auth/password-reset.html", token=token)

@@ -45,8 +45,19 @@ class User(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=False)
     date_joined = db.Column(db.Date)
 
+    # settings
+    notifications_system = db.Column(db.Boolean, default=Config.DEFAULT_SETTINGS["NOTIFICATIONS_SYSTEM"])
+    notifications_todolist = db.Column(db.Boolean, default=Config.DEFAULT_SETTINGS["NOTIFICATIONS_TODOLIST"])
+    notifications_timer = db.Column(db.Boolean, default=Config.DEFAULT_SETTINGS["NOTIFICATIONS_TIMER"])
+    notifications_chatbot = db.Column(db.Boolean, default=Config.DEFAULT_SETTINGS["NOTIFICATIONS_CHATBOT"])
+    _timer_work_session_length = db.Column(db.Integer, default=Config.DEFAULT_SETTINGS["TIMER_WORK_SESSION_LENGTH"])
+    _timer_short_break_session_length = db.Column(db.Integer, default=Config.DEFAULT_SETTINGS["TIMER_SHORT_BREAK_SESSION_LENGTH"])
+    _timer_long_break_session_length = db.Column(db.Integer, default=Config.DEFAULT_SETTINGS["TIMER_LONG_BREAK_SESSION_LENGTH"])
+    _timer_interval = db.Column(db.Integer, default=Config.DEFAULT_SETTINGS["TIMER_INTERVAL"])
+
     todolist = db.relationship("Todolist", backref="user", lazy=True)
-    timer_session_count = db.relationship("TimerSessionCount", backref="user", lazy=True)
+    timer_session_count = db.relationship("TimerSessionCount", backref="user", 
+    lazy=True)
     chatbot_message = db.relationship("ChatbotMessage", backref="user", lazy=True)
 
     @hybrid_property
@@ -149,17 +160,69 @@ class User(UserMixin, db.Model):
             return False
         
         return db.session.execute(db.select(User).filter_by(id=id)).scalar_one()
+    
+    # warning: violate DRY -> heresy
+    @hybrid_property
+    def timer_work_session_length(self):
+        return self._timer_work_session_length
+    
+    @timer_work_session_length.setter
+    def timer_work_session_length(self, value: int):
+        if not all([
+            isinstance(value, int),
+            0 < value < 3600,
+        ]):
+            raise ValueError
+        self._timer_work_session_length = value
+
+    @hybrid_property
+    def timer_short_break_session_length(self):
+        return self._timer_short_break_session_length
+    
+    @timer_short_break_session_length.setter
+    def timer_short_break_session_length(self, value: int):
+        if not all([
+            isinstance(value, int),
+            0 < value < 3600,
+        ]):
+            raise ValueError
+        self._timer_short_break_session_length = value
+
+    @hybrid_property
+    def timer_long_break_session_length(self):
+        return self._timer_long_break_session_length
+    
+    @timer_long_break_session_length.setter
+    def timer_long_break_session_length(self, value: int):
+        if not all([
+            isinstance(value, int),
+            0 < value < 3600,
+        ]):
+            raise ValueError
+        self._timer_long_break_session_length = value
+
+    @hybrid_property
+    def timer_interval(self):
+        return self._timer_interval
+    
+    @timer_interval.setter
+    def timer_interval(self, value: int):
+        if not all([
+            isinstance(value, int),
+            0 < value < 99,
+        ]):
+            raise ValueError
+        self._timer_interval = value
 
 
 @login_manager.user_loader
 def user_loader(user_id):
-    return User.query.get(int(user_id))
+    return db.session.execute(db.select(User).where(User.id == int(user_id))).scalar_one()
 
 
 class Todolist(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     _value = db.Column(db.String(128), index=True, nullable=False)
-
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     @hybrid_property
@@ -177,7 +240,6 @@ class TimerSessionCount(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     _date = db.Column(db.Date, unique=True, nullable=False)
     _session_count = db.Column(db.SmallInteger, nullable=False, default=1)
-
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     @hybrid_property
@@ -208,7 +270,6 @@ class ChatbotMessage(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     _value = db.Column(db.String(512), nullable=False)
     _type = db.Column(db.String(8), nullable=False, default="server")
-
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     @hybrid_property

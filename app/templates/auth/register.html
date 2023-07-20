@@ -5,9 +5,9 @@
 {% block content %}
 <div class="flex justify-center items-center max-w-7xl h-full mx-auto px-8">
   <form action="{{ url_for('auth.register') }}" method="post" class="flex flex-col gap-4 caret-caret-color">
-    <input class="rounded-lg p-2 bg-sub-color text-text-color" type="text" placeholder="email" name="email">
+    <input class="rounded-lg p-2 bg-sub-color text-text-color" type="email" placeholder="email" name="email">
     <input class="rounded-lg p-2 bg-sub-color text-text-color" type="text" placeholder="username" name="username">
-    <input class="rounded-lg p-2 bg-sub-color text-text-color" type="text" placeholder="password" name="password">
+    <input class="rounded-lg p-2 bg-sub-color text-text-color" type="password" placeholder="password" name="password">
     <div class="flex flex-row-reverse items-center justify-around">
       <button class="rounded-lg px-3 py-2 transition-colors bg-sub-color text-text-color hover:bg-sub-alt-color hover:text-main-color focus:bg-sub-alt-color focus:text-main-color" type="submit">register</button>
       <a href="{{ url_for('auth.login') }}" class="transition-colors hover:text-text-color focus:text-text-color">login</a>

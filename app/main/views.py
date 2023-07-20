@@ -1,11 +1,36 @@
 
-from flask import render_template
+from flask import render_template, session, request, redirect, url_for, flash
 from flask_login import current_user, login_required
 
 from config import Config
 from . import main
 from .. import db
 from ..models import User, Todolist, TimerSessionCount, ChatbotMessage
+
+
+@main.before_app_request
+def populate_session():
+    if "is_first_request" in session:
+        return
+    session.update({
+        "settings": {key: getattr(current_user, key.lower()) for key in Config.DEFAULT_SETTINGS.keys()} if current_user.is_authenticated else {key: item["value"] for key, item in Config.DEFAULT_SETTINGS.items()},
+        "is_settings_changed": False,
+        "is_todolist_ready": True,
+        "is_timer_ready": True,
+        "is_chatbot_ready": True,
+        "is_first_request": False,
+    })
+
+# must include response as param & return response
+@main.after_request
+def register_settings(response):
+    if not session["is_settings_changed"]:
+        return response
+    session.update({
+        "settings": {key: getattr(current_user, key.lower()) for key in Config.DEFAULT_SETTINGS.keys()} if current_user.is_authenticated else {key: item["value"] for key, item in Config.DEFAULT_SETTINGS.items()},
+        "is_settings_changed": False,
+    })
+    return response
 
 
 @main.route("/")
@@ -36,7 +61,34 @@ def stats():
     return render_template("views/stats.html")
 
 
-@main.route("/settings")
+@main.route("/settings", methods=["GET", "POST"])
 @login_required
 def settings():
-    return render_template("views/settings.html")
+    if request.method == "POST":
+        data = {key: int(request.form.get(key)) for key in Config.DEFAULT_SETTINGS.keys()}
+        current_settings = {key: int(getattr(current_user, key.lower())) for key in Config.DEFAULT_SETTINGS.keys()}
+        if data != current_settings:
+            try:
+                for key in list(Config.DEFAULT_SETTINGS.keys())[:4]:
+                    setattr(current_user, key.lower(), bool(int(request.form.get(key))))
+                for key in list(Config.DEFAULT_SETTINGS.keys())[4:]:
+                    setattr(current_user, key.lower(), int(request.form.get(key)))
+            except ValueError:
+                flash("settings updated unsuccessfully.")
+                return redirect(url_for("main.settings"))
+            else:
+                db.session.commit()
+                session["is_settings_changed"] = True
+                flash("settings updated successfully.")
+        else:
+            flash("nothing have changed.")
+        return redirect(url_for("main.settings"))
+    if current_user.is_authenticated:
+        data = {key: {
+            "value": getattr(current_user, key.lower()),
+            "title": item["title"],
+            "description": item["description"],
+        } for key, item in Config.DEFAULT_SETTINGS.items()}
+    else:
+        data = Config.DEFAULT_SETTINGS
+    return render_template("views/settings.html", data=data)

@@ -7,12 +7,6 @@ from .. import db
 from ..models import Todolist
 
 
-@api.before_request
-def before_todolist_request():
-    if "is_todolist_ready" not in session:
-        session["is_todolist_ready"] = True
-
-
 @api.post("/todolist/create")
 def create_todolist_item():
     if not request.is_json:

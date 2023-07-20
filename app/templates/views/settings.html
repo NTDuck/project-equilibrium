@@ -1,4 +1,86 @@
 {% extends "base.html" %}
 
 {% block content %}
+<form method="post" action="{{ url_for('main.settings') }}" class="flex flex-col gap-8 max-w-7xl h-full mx-auto p-8 scroll-smooth">
+
+  <div class="text-3xl">notifications</div>
+
+  {% for key, item in data.items() %}
+  <div class="grid grid-cols-3 gap-8 items-center">
+    <div class="col-span-2">
+      <p>{{ item.title }}</p>
+      <p class="text-text-color">{{ item.description }}</p>
+    </div>
+    {% if item.value is boolean %}
+    <div class="flex flex-row h-min gap-4 settings-select">
+      <div class="flex-grow rounded-lg py-2 px-8 text-center cursor-pointer bg-sub-alt-color text-text-color hover:bg-text-color hover:text-sub-alt-color transition-colors settings-button-0">off</div>
+      <div class="flex-grow rounded-lg py-2 px-8 text-center cursor-pointer bg-sub-alt-color text-text-color hover:bg-text-color hover:text-sub-alt-color transition-colors settings-button-1">on</div>
+      <input type="hidden" name="{{ key }}" value="{{ item.value|int }}">
+    </div>
+    {% else %}
+    <div class="flex flex-row items-center justify-between settings-select">
+      <div class="text-text-color hover:text-main-color cursor-pointer settings-button-decrease">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" class="transition-colors fill-current h-6">
+          <path d="M9.4 278.6c-12.5-12.5-12.5-32.8 0-45.3l128-128c9.2-9.2 22.9-11.9 34.9-6.9s19.8 16.6 19.8 29.6l0 256c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9l-128-128z"/>
+        </svg>
+      </div>
+      <input readonly type="number" name="{{ key }}" value="{{ item.value|int }}" class="text-2xl text-text-color w-10 text-center bg-transparent">
+      <div class="text-text-color hover:text-main-color cursor-pointer settings-button-increase">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" class="transition-colors fill-current h-6">
+          <path d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z"/>
+        </svg>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <button type="button" class="self-center mt-4 py-2 px-8 rounded-lg cursor-default bg-sub-alt-color text-sub-color transition-colors duration-300">save</button>
+
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  function enableSubmitButton() {
+    $("button").removeClass("bg-sub-alt-color text-sub-color cursor-default").addClass("bg-main-color text-sub-alt-color hover:bg-text-color cursor-pointer");
+    $("button").click(function() {
+      $("form").trigger("submit");
+    });
+  }
+  $(document).ready(function() {
+    $("input:hidden").each(function() {
+      $(this).closest(".settings-select").find(`.settings-button-${$(this).val()}`).removeClass("bg-sub-alt-color text-text-color").addClass("bg-main-color text-sub-alt-color");
+    })
+    $(".settings-button-0").click(function() {
+      $(this).closest(".settings-select").find("input").val(0);
+      $(this).removeClass("bg-sub-alt-color text-text-color").addClass("bg-main-color text-sub-alt-color");
+      $(this).closest(".settings-select").find(".settings-button-1").removeClass("bg-main-color text-sub-alt-color").addClass("bg-sub-alt-color text-text-color");
+      enableSubmitButton();
+    });
+    $(".settings-button-1").click(function() {
+      $(this).closest(".settings-select").find("input").val(1);
+      $(this).removeClass("bg-sub-alt-color text-text-color").addClass("bg-main-color text-sub-alt-color");
+      $(this).closest(".settings-select").find(".settings-button-0").removeClass("bg-main-color text-sub-alt-color").addClass("bg-sub-alt-color text-text-color");
+      enableSubmitButton();
+    });
+    $(".settings-button-decrease").click(function() {
+      const input = $(this).closest(".settings-select").find("input");
+      const val = input.val();
+      if (0 < parseInt(val) && parseInt(val) <= 3600) {
+        input.val(parseInt(val) - 1);
+      }
+      enableSubmitButton();
+    });
+    $(".settings-button-increase").click(function() {
+      const input = $(this).closest(".settings-select").find("input");
+      const val = input.val();
+      if (0 <= parseInt(val) && parseInt(val) < 3600) {
+        input.val(parseInt(val) + 1);
+      }
+      enableSubmitButton();
+    });
+  });
+</script>
 {% endblock %}

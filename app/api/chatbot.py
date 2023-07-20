@@ -8,12 +8,6 @@ from ..utils import text_generation
 from ..models import ChatbotMessage
 
 
-@api.before_request
-def before_chatbot_request():
-    if "is_chatbot_ready" not in session:
-        session["is_chatbot_ready"] = True
-
-
 @api.post("/chatbot/user-msg/create")
 def create_user_message():
     if not request.json:

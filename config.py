@@ -1,8 +1,53 @@
 
 import os
 
+
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
+
+    # dict[str, dict[str, bool|int]]
+    DEFAULT_SETTINGS = {
+        "NOTIFICATIONS_SYSTEM": {
+            "value": True,
+            "title": "system notifications",
+            "description": "this controls whether you receive notifications or not. enabled by default. can technically be disabled, but the whole user experience would be ruined.",
+        },
+        "NOTIFICATIONS_TODOLIST": {
+            "value": False,
+            "title": "todolist notifications",
+            "description": "enabled by literally no one.",
+        },
+        "NOTIFICATIONS_TIMER": {
+            "value": False,
+            "title": "neco-arc notifications",
+            "description": "if enabled, we will tell you every time you complete a pomodoro session. disabled by default - even neco-arc hates it.",
+        },
+        "NOTIFICATIONS_CHATBOT": {
+            "value": False,
+            "title": "chatbot notifications",
+            "description": "who on earth would enable this?",
+        },
+        "TIMER_WORK_SESSION_LENGTH": {
+            "value": 45,
+            "title": "work session",
+            "description": "this controls the how long you will work per session. default is 45 minutes. feel free to opt differently however you like. it's ok, we won't judge you.",
+        },
+        "TIMER_SHORT_BREAK_SESSION_LENGTH": {
+            "value": 5,
+            "title": "short break session",
+            "description": "you are smart, so we don't need to explain what this does.",
+        },
+        "TIMER_LONG_BREAK_SESSION_LENGTH": {
+            "value": 15,
+            "title": "long break session",
+            "description": "devs are lazy so see above.",
+        },
+        "TIMER_INTERVAL": {
+            "value": 4,
+            "title": "interval",
+            "description": "we can't yet explain this coherently. by default, the interval is 4, so on every 4th session, you will earn a long break instead of a short break. something like that.",
+        },
+    }
 
     TODOLIST_EXAMPLE_MESSAGES = [
         "hello, dear user!",
@@ -60,6 +105,8 @@ class Config:
     HUGGINGFACE_MODEL = "distilgpt2"
     HUGGINGFACE_MODEL_MIN_LENGTH = 20
     HUGGINGFACE_MODEL_MAX_LENGTH = 100
+
+    # PERMANENT_SESSION_LIFETIME = timedelta(hours=1)
 
     # flask-sqlalchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False

@@ -30,8 +30,6 @@ def get_timer_gifs(folder):
 
 @api.post("/timer/session-count/update")
 def update_timer_session_count():
-    if "is_timer_ready" not in session:
-        session["is_timer_ready"] = True
     if not request.is_json:
         abort(400)
     if not "session-count" in request.json:
