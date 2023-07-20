@@ -36,10 +36,10 @@ def update_timer_session_count():
         abort(400)
     if current_user.is_authenticated:
         if not session["is_timer_ready"]:
-            return jsonify({
-                "error": 418,
-                "flash": "please wait a few seconds.",
-            })
+            response = {"error": 418}
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                response.update({"flash": "please wait a few seconds."})
+            return jsonify(response)
         session["is_timer_ready"] = False
         item = db.session.execute(db.select(TimerSessionCount).where(db.and_(TimerSessionCount.user == current_user, TimerSessionCount.date == date.today()))).scalar_one_or_none()
         try:
@@ -51,16 +51,17 @@ def update_timer_session_count():
                 item = TimerSessionCount(user=current_user, date=date.today(), session_count=1)
                 db.session.add(item)
         except ValueError:
-            return jsonify({
-                "error": 400,
-                "flash": "please try again later.",
-            })
+            response = {"error": 400}
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                response.update({"flash": "please try again later."})
+            return jsonify(response)
         else:
             db.session.commit()
             session["is_timer_ready"] = True
-    return jsonify({
-        "flash": "pomodoro completed.",
-    })
+    response = {}
+    if session["settings"]["NOTIFICATIONS_TIMER"]:
+        response.update({"flash": "pomodoro completed."})
+    return jsonify(response)
 
 
 @api.get("/timer/session-count/get")

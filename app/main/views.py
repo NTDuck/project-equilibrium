@@ -74,14 +74,17 @@ def settings():
                 for key in list(Config.DEFAULT_SETTINGS.keys())[4:]:
                     setattr(current_user, key.lower(), int(request.form.get(key)))
             except ValueError:
-                flash("settings updated unsuccessfully.")
+                if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                    flash("settings updated unsuccessfully.")
                 return redirect(url_for("main.settings"))
             else:
                 db.session.commit()
                 session["is_settings_changed"] = True
-                flash("settings updated successfully.")
+                if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                    flash("settings updated successfully.")
         else:
-            flash("nothing have changed.")
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("nothing have changed.")
         return redirect(url_for("main.settings"))
     if current_user.is_authenticated:
         data = {key: {

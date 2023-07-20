@@ -19,24 +19,27 @@ def create_user_message():
     if current_user.is_authenticated:
         try:
             if not session["is_chatbot_ready"]:
-                return jsonify({
-                    "error": 418,
-                    "flash": "please wait a few seconds.",
-                })
+                response = {"error": 418}
+                if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                    response.update({"flash": "please wait a few seconds."})
+                return jsonify(response)
             session["is_chatbot_ready"] = False
             item = ChatbotMessage(user=current_user, value=value, type="user")
         except ValueError:
-            return jsonify({
-                "error": 400,
-                "flash": "item invalid. please try again.",
-            })
+            response = {"error": 400}
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                response.update({"flash": "item invalid. please try again."})
+            return jsonify(response)
         else:
             db.session.add(item)
             db.session.commit()
-    return jsonify({
+    response = {
         "id": item.id if current_user.is_authenticated else 0,
         "value": value,
-    })
+    }
+    if session["settings"]["NOTIFICATIONS_CHATBOT"]:
+        response.update({"flash": "chatbot user message created."})
+    return jsonify(response)
 
 
 @api.post("/chatbot/user-msg/update/<phase>")
@@ -48,10 +51,10 @@ def edit_user_message(phase):
     # might try implementing a dict[str, method]
     if phase == "user":
         if not session["is_chatbot_ready"]:
-            return jsonify({
-                "error": 418,
-                "flash": "please wait a few seconds.",
-            })
+            response = {"error": 418}
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                response.update({"flash": "please wait a few seconds."})
+            return jsonify(response)
         session["is_chatbot_ready"] = False
         if not "chatbot-user-msg-update" in data and not "id" in data:
             abort(400)
@@ -65,13 +68,16 @@ def edit_user_message(phase):
                 setattr(item, "value", user_msg_value)
                 db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= item.id + 2)))
             except ValueError:
-                return jsonify({
-                    "error": 400,
-                    "flash": "item invalid. please try again.",
-                })
+                response = {"error": 400}
+                if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                    response.update({"flash": "item invalid. please try again."})
+                return jsonify(response)
             else:
                 db.session.commit()
-        return jsonify({})
+        response = {}
+        if session["settings"]["NOTIFICATIONS_CHATBOT"]:
+            response.update({"flash": "chatbot user message updated."})
+        return jsonify(response)
     
     elif phase == "server":
         if not "chatbot-user-msg-last" in data and not "id" in data:
@@ -87,16 +93,17 @@ def edit_user_message(phase):
                     abort(400)
                 setattr(item, "value", server_msg_next_value)
             except ValueError:
-                return jsonify({
-                    "error": 400,
-                    "flash": "item invalid. please try again.",
-                })
+                response = {"error": 400}
+                if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                    response.update({"flash": "item invalid. please try again."})
+                return jsonify(response)
             else:
                 db.session.commit()
                 session["is_chatbot_ready"] = True
-        return jsonify({
-            "value": server_msg_next_value,
-        })
+        response = {"value": server_msg_next_value}
+        if session["settings"]["NOTIFICATIONS_CHATBOT"]:
+            response.update({"flash": "chatbot server message updated."})
+        return jsonify(response)
     else:
         abort(400)
 
@@ -111,15 +118,18 @@ def delete_user_message():
     id = data.get("id")
     if current_user.is_authenticated:
         if not session["is_chatbot_ready"]:
-            return jsonify({
-                "error": 418,
-                "flash": "please wait a few seconds.",
-            })
+            response = {"error": 418}
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                response.update({"flash": "please wait a few seconds."})
+            return jsonify(response)
         session["is_chatbot_ready"] = False
         db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= id)))
         db.session.commit()
         session["is_chatbot_ready"] = True
-    return jsonify({})
+    response = {}
+    if session["settings"]["NOTIFICATIONS_CHATBOT"]:
+        response.update({"flash": "chatbot user message deleted."})
+    return jsonify(response)
 
 
 @api.post("/chatbot/server-msg/create")
@@ -135,27 +145,30 @@ def create_server_message():
         try:
             item = ChatbotMessage(user=current_user, value=server_msg_value, type="server")
         except ValueError:
-            return jsonify({
-                "error": 400,
-                "flash": "item invalid. please try again.",
-            })
+            response = {"error": 400}
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                response.update({"flash": "item invalid. please try again."})
+            return jsonify(response)
         else:
             db.session.add(item)
             db.session.commit()
             session["is_chatbot_ready"] = True
-    return jsonify({
+    response = {
         "id": item.id,
         "value": server_msg_value,
-    })
+    }
+    if session["settings"]["NOTIFICATIONS_CHATBOT"]:
+        response.update({"flash": "chatbot server message created."})
+    return jsonify(response)
 
 
 @api.post("/chatbot/server-msg/update")
 def update_server_message():
     if not session["is_chatbot_ready"]:
-        return jsonify({
-            "error": 418,
-            "flash": "please wait a few seconds.",
-        })
+        response = {"error": 418}
+        if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+            response.update({"flash": "please wait a few seconds."})
+        return jsonify(response)
     session["is_chatbot_ready"] = False
     if not request.json:
         abort(400)
@@ -167,10 +180,10 @@ def update_server_message():
     if current_user.is_authenticated:
         item = db.session.execute(db.select(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id == id))).scalar_one_or_none()
         if item is None:
-            return jsonify({
-                "error": 400,
-                "flash": "item invalid. please try again.",
-            })
+            response = {"error": 400}
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                response.update({"flash": "item invalid. please try again."})
+            return jsonify(response)
         db.session.execute(db.delete(ChatbotMessage).where(db.and_(ChatbotMessage.user == current_user, ChatbotMessage.id >= item.id + 1)))
 
     user_msg_last_value = data.get("chatbot-user-msg-last")
@@ -179,13 +192,14 @@ def update_server_message():
         try:
             setattr(item, "value", server_msg_next_value)
         except ValueError:
-            return jsonify({
-                "error": 400,
-                "flash": "item invalid. please try again.",
-            })
+            response = {"error": 400}
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                response.update({"flash": "item invalid. please try again."})
+            return jsonify(response)
         else:
             db.session.commit()
             session["is_chatbot_ready"] = True
-    return jsonify({
-        "value": server_msg_next_value,
-    })
+    response = {"value": server_msg_next_value}
+    if session["settings"]["NOTIFICATIONS_CHATBOT"]:
+        response.update({"flash": "chatbot server message updated."})
+    return jsonify(response)

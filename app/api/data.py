@@ -2,7 +2,7 @@
 from datetime import date
 from io import BytesIO
 
-from flask import send_file, request, redirect, url_for, json, flash
+from flask import send_file, request, redirect, url_for, json, flash, session, abort
 from flask_login import login_required, current_user
 from sqlalchemy import delete
 
@@ -39,7 +39,8 @@ def download_user_data():
 
     file_name = f"pr-eq-export-{date.today()}.json"
 
-    flash(f"user {current_user.username}'s data downloaded as {file_name}")
+    if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+        flash(f"user {current_user.username}'s data downloaded as {file_name}")
     
     # Send the file to the client
     return send_file(path_or_file=file, mimetype="application/json", as_attachment=True, download_name=file_name)
@@ -52,7 +53,8 @@ def delete_user_data():
         db.session.execute(delete(table).where(table.user == current_user))
     # note-to-self: send fetch request to frontend to clear localStorage
     db.session.commit()
-    flash("data deleted successfully.")
+    if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+        flash("data deleted successfully.")
     return redirect(url_for("main.index"))
 
 
@@ -60,15 +62,17 @@ def delete_user_data():
 @login_required
 def upload_user_data():
     # check if post request has uploaded file
-    if "user-data" not in request.files:
+    if "user-data" not in request.files and session["settings"]["NOTIFICATIONS_SYSTEM"]:
         flash("unknown error.")
+        return abort(400)
     
     file = request.files.get("user-data")
 
     # check if file is valid
     json_data = validate_json_data(file)
     if json_data is None:
-        flash("invalid data. please try again.")
+        if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+            flash("invalid data. please try again.")
         return redirect(url_for("main.index"))
 
     # handle json data upon validation
@@ -95,11 +99,13 @@ def upload_user_data():
                 item = table(user=current_user, **attrs)
                 db.session.add(item)
     except ValueError:
-        flash("invalid data. please try again.")
+        if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+            flash("invalid data. please try again.")
         return redirect(url_for("main.index"))
     else:
         db.session.commit()
-        flash("data uploaded successfully.")
+        if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+            flash("data uploaded successfully.")
     return redirect(url_for("main.index"))
 
 

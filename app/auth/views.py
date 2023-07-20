@@ -36,14 +36,17 @@ def login():
         password = request.form.get("password").strip()
         user = db.session.execute(db.select(User).filter_by(email=email)).scalar_one_or_none()
         if user is None:
-            flash("user does not exist, please register instead.")
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("user does not exist, please register instead.")
             return redirect(url_for("auth.register"))
         if not user.verify_password(password):
-            flash("false credentials.")
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("false credentials.")
             return redirect(url_for("auth.login"))
         # if everything is okay
         login_user(user)
-        flash("logged in successfully.")
+        if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+            flash("logged in successfully.")
         return redirect(url_for("main.index"))
     return render_template("auth/login.html")
 
@@ -52,7 +55,8 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("logged out successfully.")
+    if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+        flash("logged out successfully.")
     return redirect(url_for("main.index"))
 
 
@@ -65,13 +69,16 @@ def register():
         try:
             user = User(email=email, username=username, password=password, date_joined=date.today())
         except ValueError:
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("registered unsuccessfully. please try again.")
             return redirect(url_for("auth.register"))
         else:
             db.session.add(user)
             db.session.commit()
         token = user.generate_confirmation_token()
         send_email([getattr(user, "email")], "confirm your account", "auth/email/confirm", user=user, token=token, expiration=f"{Config.CONFIRMATION_TOKEN_EXPIRATION // 60} minutes")
-        flash("registered successfully.")
+        if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+            flash("registered successfully.")
         return redirect(url_for("auth.login"))
     return render_template("auth/register.html")
 
@@ -84,9 +91,11 @@ def confirm(token):
     if current_user.validate_confirmation_token(token):
         setattr(current_user, "confirmed", True)
         db.session.commit()
-        flash("token confirmed successfully.")
+        if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+            flash("token confirmed successfully.")
     else:
-        flash("token invalid. please try again.")
+        if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+            flash("token invalid. please try again.")
     return redirect(url_for("main.index"))
 
 
@@ -122,14 +131,18 @@ def password_update():
         old_password = request.form.get("old-password").strip()
         new_password = request.form.get("new-password").strip()
         if not current_user.verify_password(old_password):
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("old password not match")
             return redirect(url_for("auth.password_update"))
         try:
             setattr(current_user, "password", new_password)
         except ValueError:
-            flash("password invalid. please try again.")
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("password invalid. please try again.")
             return redirect(url_for("auth.password_update"))
         else:
-            flash("password updated successfully.")
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("password updated successfully.")
             db.session.commit()
         return redirect(url_for("auth.profile"))
     return render_template("auth/password-update.html")
@@ -144,7 +157,8 @@ def password_reset_request():
         except:
             return abort(400)   # ?
         if user is None:
-            flash("user does not exist, please register instead.")
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("user does not exist, please register instead.")
             return redirect(url_for("auth.register"))
         token = user.generate_password_reset_token()
         send_email([getattr(user, "email")], "password reset", "auth/email/password-reset", user=user, token=token, expiration=f"{Config.CONFIRMATION_TOKEN_EXPIRATION // 60} minutes")
@@ -158,17 +172,20 @@ def password_reset_confirm(token):
         new_password = request.form.get("password").strip()
         user = User.validate_password_reset_token(token=token)
         if not user:
-            flash("token invalid. please try again.")
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("token invalid. please try again.")
             abort(400)
         try:
             setattr(user, "password", new_password)
         except ValueError:
-            flash("password invalid. please try again.")
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("password invalid. please try again.")
             abort(400)
         else:
             db.session.commit()
             session.pop("password_reset_token", None)   # remove from session if exists
-            flash("password reset successfully.")
+            if session["settings"]["NOTIFICATIONS_SYSTEM"]:
+                flash("password reset successfully.")
             return redirect(url_for("auth.login"))
     session["password_reset_token"] = token   # store to session
     return render_template("auth/password-reset.html", token=token)
